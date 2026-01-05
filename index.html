@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>농담곰 컬렉션 북</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-title">NONGDAMGOM</div>
+            
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="owned">보유</button>
+                <button class="tab-btn" data-tab="wish">위시</button>
+            </div>
+
+            <div class="filter-item-wrapper">
+                <div class="filter-group">
+                    <button class="text-btn active" onclick="setFilter('country', 'all')">ALL</button>
+                    <div class="flag-btn" style="background-image: url('images/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea')">
+                        <div class="overlay">한국</div>
+                    </div>
+                    <div class="flag-btn" style="background-image: url('images/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan')">
+                        <div class="overlay">일본</div>
+                    </div>
+                    <div class="flag-btn" style="background-image: url('images/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china')">
+                        <div class="overlay">중국</div>
+                    </div>
+                    <div class="flag-btn" style="background-image: url('images/icon_flag/flag_tw.png');" onclick="setFilter('country', 'taiwan')">
+                        <div class="overlay">대만</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-item-wrapper">
+                <span class="filter-label">캐릭터</span>
+                <div class="filter-group">
+                    <button class="text-btn active" onclick="setFilter('character', 'all')">ALL</button>
+                    <div class="char-btn" style="background-image: url('images/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma')">
+                        <div class="overlay">농담곰</div>
+                    </div>
+                    <div class="char-btn" style="background-image: url('images/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro')">
+                        <div class="overlay">두더지<br>고로케</div>
+                    </div>
+                    <div class="char-btn" style="background-image: url('images/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug')">
+                        <div class="overlay">퍼그 상</div>
+                    </div>
+                    <div class="char-btn" style="background-image: url('images/icon_characters/icon_ngn.png');" onclick="setFilter('character', 'ngn')">
+                        <div class="overlay">기타</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-item-wrapper">
+                <span class="filter-label">회사</span>
+                <div class="filter-group" data-type="company">
+                    <button class="text-btn active" onclick="setCompanyFilter('all')" data-val="all">ALL</button>
+                    <button class="text-btn" onclick="setCompanyFilter('old')" data-val="old">예전</button>
+                    <button class="text-btn" onclick="setCompanyFilter('new')" data-val="new">현재</button>
+                </div>
+                <div id="old-subs" class="sub-filter-container"></div>
+                <div id="new-subs" class="sub-filter-container"></div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="reset-btn" onclick="resetFilters()">🔄 필터 리셋</button>
+                <button class="reset-btn record-reset" onclick="resetRecords()">🗑️ 기록 삭제</button>
+            </div>
+
+            <hr class="sidebar-divider">
+            <div class="save-options">
+                <span class="filter-label">저장 옵션</span>
+                <div class="option-row">
+                    <label class="option-check">
+                        <input type="checkbox" id="showName" checked> 상품명
+                    </label>
+                    <label class="option-check">
+                        <input type="checkbox" id="showPrice" checked> 가격
+                    </label>
+                </div>
+                <button class="action-btn" id="genBtn" onclick="generateImage()">이미지 저장</button>
+            </div>
+
+        </aside>
+
+        <main class="main-content">
+            <div id="listContainer" class="list-container">
+                </div>
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
