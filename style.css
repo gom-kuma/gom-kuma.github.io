@@ -8,17 +8,16 @@
 }
 
 :root {
-    --bg-color: #fdfbf7;
+    --bg-color: #fafafa;
     --owned-color: #aeb4d1; 
-    --wish-color: #fca2a2; 
+    --wish-color: #a1c2dd; 
     --text-color: #2d3436;
-    --border-color: #eae8e4;
+    --border-color: #f5f5f5;
     --sidebar-width: 350px; 
     --theme-color: var(--owned-color);
 }
 
-body.theme-wish { --theme-color: var(--wish-color); }
-
+/* 폰트 강제 적용 */
 button, input, select, textarea {
     font-family: 'Gowun Dodum', sans-serif;
 }
@@ -31,6 +30,11 @@ body {
     height: 100vh;
     overflow: hidden; 
     display: flex; flex-direction: column;
+}
+
+/* body 전체에 테마 컬러 적용 */
+body.theme-wish { 
+    --theme-color: var(--wish-color); 
 }
 
 .app-container { display: flex; height: 100%; width: 100%; max-width: none; margin: 0; }
@@ -63,25 +67,25 @@ body {
     cursor: pointer; transition: 0.2s;
 }
 
-body.theme-wish .tab-btn:not(.active) { color: #f2bbbb; }
+/* 위시 모드 텍스트 컬러 */
+body.theme-wish .tab-btn:not(.active) { color: #a1c2dd; }
 
 .tab-btn.active { background: white; color: var(--theme-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold; }
 
 .filter-group { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 
-/* [수정] 라벨 하단 여백 제거 (컨테이너 gap으로 통일하기 위해) */
 .filter-label { 
     font-size: 14px; font-weight: bold; color: #b2bec3; 
-    margin-bottom: 0; /* 10px -> 0으로 변경 */
+    margin-bottom: 0; 
     text-align: center; display: block; 
 }
-body.theme-wish .filter-label { color: #f2bbbb; } 
+/* 위시 모드 라벨 */
+body.theme-wish .filter-label { color: #a1c2dd; } 
 
-/* [추가] 필터 섹션: 저장 옵션과 동일한 구조와 간격 적용 */
 .filter-section {
     display: flex; 
     flex-direction: column; 
-    gap: 12px; /* 라벨과 컨텐츠 사이의 간격 */
+    gap: 12px; 
 }
 
 .flag-btn {
@@ -121,7 +125,8 @@ body.theme-wish .filter-label { color: #f2bbbb; }
 .sub-filter-container.show { display: flex; width: 100%; }
 
 .sub-btn { padding: 5px 10px; border: 1px solid #dfe6e9; border-radius: 6px; background: #f8f9fa; cursor: pointer; font-size: 12px; color: #b2bec3; }
-body.theme-wish .sub-btn { color: #f2bbbb; } 
+/* 위시 모드 서브 버튼 텍스트 */
+body.theme-wish .sub-btn { color: #a1c2dd; } 
 
 .sub-btn.active { background: var(--theme-color); color: white; border-color: var(--theme-color); }
 body.theme-wish .sub-btn.active { color: white; }
@@ -134,16 +139,15 @@ body.theme-wish .sub-btn.active { color: white; }
     display: flex; justify-content: center; align-items: center;
 }
 .reset-btn:hover { background: #f1f2f6; border-color: var(--theme-color); color: var(--theme-color); }
-.record-reset:hover { background: #fff0f0; border-color: #fca2a2; color: #fca2a2; }
 
-.sidebar-divider { border: none; border-top: 1px solid var(--border-color); margin: 5px 0; }
-
-/* [수정] 저장 옵션: 간격을 12px로 통일 */
-.save-options { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; /* 필터 섹션과 동일한 간격 */
+/* 기록 삭제 호버 */
+.record-reset:hover { 
+    background: #fff0f0; 
+    border-color: #fca2a2; 
+    color: #fca2a2; 
 }
+.sidebar-divider { border: none; border-top: 1px solid var(--border-color); margin: 5px 0; }
+.save-options { display: flex; flex-direction: column; gap: 12px; }
 
 .custom-input {
     border: 1px solid #dfe6e9; border-radius: 8px; padding: 8px;
@@ -176,7 +180,6 @@ body.theme-wish .sub-btn.active { color: white; }
 }
 .save-options .action-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
 
-/* '현재 페이지 저장' 버튼 스타일 (흰색 배경) */
 .save-options .page-btn {
     background: white; border: 2px solid var(--theme-color); color: var(--theme-color);
 }
@@ -199,13 +202,16 @@ body.theme-wish .sub-btn.active { color: white; }
     position: relative; 
     transition: 0.2s; 
     display: flex; flex-direction: column; 
+    height: 100%; 
+    justify-content: space-between;
 }
 
 .item-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
 .item-card.checked { border: 2px solid var(--theme-color); }
 
+/* [수정] 위시 모드 체크된 카드 배경색: 연한 하늘색(#dbeef8) */
 body:not(.theme-wish) .item-card.checked { background: #f4f6ff; }
-body.theme-wish .item-card.checked { background: #fff0f0; }
+body.theme-wish .item-card.checked { background: #eaf5fa; }
 
 .item-img-wrapper { width: 100%; aspect-ratio: 1/1; position: relative; background: #fff; border-bottom: 1px solid #f8f9fa; }
 .item-img-wrapper img { width: 100%; height: 100%; object-fit: contain; padding: 15px; box-sizing: border-box; }
@@ -215,11 +221,33 @@ body.theme-wish .item-card.checked { background: #fff0f0; }
 .item-card.checked .check-overlay { opacity: 1; }
 
 .item-info { padding: 15px 10px; text-align: center; }
-.item-name { font-size: 14px; font-weight: bold; line-height: 1.4; margin-bottom: 8px; word-break: keep-all; min-height: 34px; }
-.item-price { font-size: 12px; color: #a4b0be; font-weight: bold; background: #f1f2f6; padding: 3px 8px; border-radius: 4px; display: inline-block; }
 
+.item-name { 
+    font-size: 14px; font-weight: bold; line-height: 1.4; 
+    margin-bottom: 8px; word-break: keep-all; 
+    height: 63px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
 
-/* --- 모바일 반응형 스타일 (화면 너비 768px 이하일 때 적용) --- */
+/* 기본 가격표 스타일 */
+.item-price { 
+    font-size: 12px; 
+    color: #a4b0be; 
+    font-weight: bold; 
+    background: #f1f2f6; 
+    padding: 3px 8px; border-radius: 4px; display: inline-block; 
+}
+
+/* 위시 모드 가격표 스타일 */
+body.theme-wish .item-price {
+    background: #f2fbff;
+    color: #a1c2dd;
+}
+
+/* --- 모바일 반응형 스타일 --- */
 @media (max-width: 768px) {
     
     .app-container {
@@ -256,7 +284,6 @@ body.theme-wish .item-card.checked { background: #fff0f0; }
     .sub-filter-container { width: 100%; justify-content: center; }
     .sub-filter-container.show { display: flex !important; }
 
-    /* 사이드바 스타일 */
     .sidebar {
         position: fixed;
         top: 0; right: -100%; left: auto;
@@ -274,11 +301,9 @@ body.theme-wish .item-card.checked { background: #fff0f0; }
     .sidebar.active { right: 0; }
     .sidebar .sidebar-title { display: none; }
 
-    /* [추가] 모바일에서도 필터 섹션과 저장 옵션 간격 동일하게 */
     .filter-section, .save-options { gap: 10px; }
 
     .tab-btn { padding: 8px; font-size: 14px; } 
-    /* 라벨 여백 제거 (gap으로 제어) */
     .filter-label { margin-bottom: 0; font-size: 13px; } 
     
     .filter-group { justify-content: center; gap: 6px; }

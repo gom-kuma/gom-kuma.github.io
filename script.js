@@ -19,7 +19,7 @@ function init() {
 function switchTab(tab) {
     currentTab = tab;
     
-    // 테마 적용 (CSS 변수 변경됨 -> 햄버거 버튼, 로고, 뱃지 색상 자동 변경)
+    // 테마 적용 
     if (tab === 'wish') { 
         document.body.classList.add('theme-wish'); 
     } else { 
@@ -35,7 +35,7 @@ function switchTab(tab) {
         titleInput.value = tab === 'owned' ? "농담곰 인형 보유 리스트" : "농담곰 인형 위시 리스트";
     }
 
-    // ✨ [추가] 모바일 헤더 뱃지 텍스트 변경 ✨
+    // 모바일 헤더 뱃지 스위치
     const badge = document.getElementById('mobileModeBadge');
     if (badge) {
         badge.innerText = tab === 'owned' ? "보유" : "위시";
@@ -47,10 +47,10 @@ function updateTabUI() {
 
 function renderList() {
     listContainer.innerHTML = '';
-    const filteredData = getFilteredData(); // 헬퍼 함수 사용
+    const filteredData = getFilteredData(); 
 
     if (filteredData.length === 0) {
-        listContainer.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa;">상품을 찾을 수 없습니다.</div>';
+        listContainer.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa;">리스트를 찾을 수 없습니다.</div>';
         return;
     }
 
@@ -190,7 +190,7 @@ function toggleNickCheck() {
     }
 }
 
-// [수정된 이미지 생성 기능]
+// 이미지 생성
 // mode: 'all' (전체 체크항목) or 'current' (현재 필터링된 항목 중 체크된 것)
 // ----------------------------------------------------------------------
 async function generateImage(mode = 'all') {
