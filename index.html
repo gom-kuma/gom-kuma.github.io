@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>농담곰 인형 리스트 메이커</title>
+    <style>
+        /* (이전 스타일 코드는 그대로 유지하거나 필요 시 아래 내용으로 대체) */
+        /* ... 생략 ... */
+        
+        /* 1. 타이틀 헤더 높이 수정 관련 */
+        .list-header {
+            text-align: center;
+            padding: 10px 0; /* 패딩을 줄여서 높이 축소 */
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .list-title {
+            font-size: 1.5rem; /* 폰트 사이즈도 적절히 조절 */
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        
+        /* 닉네임 표시 스타일 */
+        .user-nickname {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            display: none; /* 기본적으로 숨김 */
+        }
+
+        /* ... 기타 스타일 ... */
+
+        /* 저장 옵션 스타일 */
+        .save-options {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        .option-group {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-group label {
+            font-weight: bold;
+        }
+
+        .option-group input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="captureArea" class="list-container">
+        <div class="list-header">
+            <h1 class="list-title" id="displayTitle">[농담곰 인형 보유 리스트]</h1>
+            <div class="user-nickname" id="displayNickname"></div>
+        </div>
+        </div>
+
+    <div class="save-options">
+        <h3>💾 저장 옵션 & 커스텀</h3>
+        
+        <div class="option-group">
+            <label>📝 리스트 제목:</label>
+            <input type="text" id="titleInput" value="[농담곰 인형 보유 리스트]" style="width: 300px;">
+        </div>
+
+        <div class="option-group">
+            <label>
+                <input type="checkbox" id="nicknameCheck" disabled> 닉네임:
+            </label>
+            <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요 (입력 시 자동 체크)">
+        </div>
+
+        <button onclick="saveImage()">이미지로 저장하기</button>
+        <button onclick="resetOptions()">초기화</button>
+    </div>
+
+    <script>
+        // 요소 가져오기
+        const titleInput = document.getElementById('titleInput');
+        const displayTitle = document.getElementById('displayTitle');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const nicknameCheck = document.getElementById('nicknameCheck');
+        const displayNickname = document.getElementById('displayNickname');
+
+        // 3. 타이틀 입력 시 실시간 반영
+        titleInput.addEventListener('input', function() {
+            displayTitle.textContent = this.value;
+        });
+
+        // 4. 닉네임 입력 시 처리
+        nicknameInput.addEventListener('input', function() {
+            const text = this.value.trim();
+            
+            // 텍스트가 있으면 체크박스 체크 & 화면 표시
+            if (text.length > 0) {
+                nicknameCheck.checked = true;
+                displayNickname.textContent = text;
+                displayNickname.style.display = 'block';
+            } else {
+                // 텍스트가 없으면 체크 해제 & 숨김
+                nicknameCheck.checked = false;
+                displayNickname.style.display = 'none';
+            }
+        });
+
+        // 체크박스를 직접 눌렀을 때의 동작 (선택 사항: 텍스트가 있는데 체크를 끄면 숨김 처리 등)
+        nicknameCheck.addEventListener('change', function() {
+            if (this.checked && nicknameInput.value.trim().length > 0) {
+                displayNickname.style.display = 'block';
+            } else {
+                displayNickname.style.display = 'none';
+            }
+        });
+
+        // 초기화 혹은 모드 변경 시 호출할 함수 예시 (보유/위시 전환)
+        function setMode(mode) {
+            if (mode === 'wish') {
+                titleInput.value = "[농담곰 인형 위시 리스트]";
+            } else {
+                titleInput.value = "[농담곰 인형 보유 리스트]";
+            }
+            // 강제로 input 이벤트 발생시켜서 타이틀 업데이트
+            titleInput.dispatchEvent(new Event('input'));
+        }
+    </script>
+</body>
+</html>
