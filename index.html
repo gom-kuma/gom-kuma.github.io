@@ -42,17 +42,9 @@
                 </label>
             </div>
 
-            <hr class="sidebar-divider">
-
-            <div class="filter-actions">
-                <button class="reset-btn" onclick="resetFilters()">🔄 필터 리셋</button>
-                <button class="reset-btn record-reset" onclick="resetRecords()">🗑️ 기록 삭제</button>
-            </div>
-
-            <hr class="sidebar-divider">
-
             <div class="filter-section">
                 <span class="filter-label">필터</span>
+                
                 <div class="filter-item-wrapper">
                     <div class="filter-group">
                         <button class="text-btn active" onclick="setFilter('country', 'all')">ALL</button>
@@ -88,7 +80,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="filter-item-wrapper">
+                    <div class="filter-group">
+                        <button class="text-btn active" onclick="setFilter('group', 'all')">ALL</button>
+                        <button class="text-btn" onclick="setFilter('group', '마스코트')">마스코트</button>
+                        <button class="text-btn" onclick="setFilter('group', '쿠션')">쿠션</button>
+                        <button class="text-btn" onclick="setFilter('group', '인형')">인형</button>
+                        <button class="text-btn" onclick="setFilter('group', '잡화')">잡화</button>
+                    </div>
+                </div>
             </div> 
+
+            <div class="filter-actions">
+                <button class="reset-btn" onclick="resetFilters()">🔄 필터 리셋</button>
+            </div>
             
             <hr class="sidebar-divider">
             
@@ -126,6 +132,10 @@
             <div id="listContainer" class="list-container">
                 <div style="text-align:center; padding:50px; color:#aaa;">데이터를 불러오는 중입니다...</div>
             </div>
+
+            <button id="deleteRecordBtn" onclick="resetRecords()">
+                <img id="deleteRecordImg" src="img/own_delete.png" alt="Delete">
+            </button>
 
             <button id="scrollTopBtn" onclick="scrollToTop()">
                 <img id="scrollTopImg" src="img/top_own.png" alt="TOP">
