@@ -1,4 +1,4 @@
-// script.js (기능 추가 최종 버전)
+// script.js (수정본)
 
 // [설정] 구글 스프레드시트 ID
 const SHEET_ID = '1hTPuwTZkRnPVoo5GUUC1fhuxbscwJrLdWVG-eHPWaIM';
@@ -8,7 +8,7 @@ let productData = [];
 
 let currentTab = 'owned'; 
 let filters = { country: 'all', character: 'all' }; 
-let isViewCheckedOnly = false; // [추가] 체크한 것만 보기 상태 변수
+let isViewCheckedOnly = false; 
 
 let checkedItems = {
     owned: new Set(JSON.parse(localStorage.getItem('nongdam_owned') || '[]')),
@@ -16,8 +16,8 @@ let checkedItems = {
 };
 
 const listContainer = document.getElementById('listContainer');
-const mainContent = document.getElementById('mainContent'); // 스크롤 감지용
-const scrollTopBtn = document.getElementById('scrollTopBtn'); // 탑 버튼
+const mainContent = document.getElementById('mainContent'); 
+const scrollTopBtn = document.getElementById('scrollTopBtn'); 
 
 // 초기화 함수
 async function init() {
@@ -25,8 +25,14 @@ async function init() {
     renderList();
     updateTabUI();
     
-    // [추가] 스크롤 이벤트 리스너 등록
+    // 스크롤 이벤트
     mainContent.addEventListener('scroll', scrollFunction);
+
+    // [PC 버그 수정] 체크박스 이벤트 리스너 강제 등록
+    const viewCheckInput = document.getElementById('viewCheckedOnly');
+    if (viewCheckInput) {
+        viewCheckInput.addEventListener('change', toggleViewChecked);
+    }
 }
 
 // 구글 시트 CSV 데이터 가져오기
@@ -108,18 +114,17 @@ function updateTabUI() {
     document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === currentTab); });
 }
 
-// [추가] 체크한 것만 모아보기 토글 함수
+// 체크한 것만 모아보기 토글 함수
 function toggleViewChecked() {
     const checkbox = document.getElementById('viewCheckedOnly');
     isViewCheckedOnly = checkbox.checked;
     renderList();
 }
 
-// [핵심 수정] 리스트 렌더링 함수 (카운트 & 필터링 로직 추가)
+// [핵심 수정] 리스트 렌더링 함수
 function renderList() {
     listContainer.innerHTML = '';
     
-    // 1. 현재 필터(국가/캐릭터)에 맞는 데이터 가져오기
     const filteredData = getFilteredData(); 
 
     if (filteredData.length === 0) {
@@ -128,7 +133,6 @@ function renderList() {
         return;
     }
 
-    // 2. 그룹핑 (마스코트, 기본 등)
     const grouped = {};
     filteredData.forEach(item => {
         let groupKey;
@@ -141,28 +145,21 @@ function renderList() {
         grouped[groupKey].push(item);
     });
 
-    // 3. 그룹별 렌더링
-    let hasAnyItem = false; // 화면에 표시된 아이템이 하나라도 있는지 확인
+    let hasAnyItem = false; 
 
     Object.keys(grouped).forEach(groupName => {
         const groupItems = grouped[groupName];
         
-        // [카운트] 이 그룹의 전체 개수와 체크된 개수 계산
         let totalCount = groupItems.length;
         let checkedCount = 0;
 
-        // 먼저 체크된 개수부터 계산 (화면 표시 여부와 상관없이 통계용)
+        // [수정 요청 반영] 위시 탭에서도 '보유 수량'만 카운트하도록 변경
         groupItems.forEach(item => {
             const isOwned = checkedItems.owned.has(item.id);
-            if (currentTab === 'owned') {
-                if (isOwned) checkedCount++;
-            } else {
-                // 위시탭: 보유(잠금) 상태이거나 위시에 체크된 경우
-                if (isOwned || checkedItems.wish.has(item.id)) checkedCount++;
-            }
+            if (isOwned) checkedCount++; 
+            // 위시 리스트 체크 여부는 카운트에 포함하지 않음 (보유 수량만 표시)
         });
 
-        // 4. 아이템 카드 생성 (DOM 요소)
         const grid = document.createElement('div');
         grid.className = 'items-grid';
         let visibleItemCount = 0;
@@ -183,7 +180,7 @@ function renderList() {
                 }
             }
 
-            // [필터링] '체크한 것만 보기'가 켜져있는데 체크 안 된 항목이면 건너뜀
+            // '체크한 것만 보기' 필터링
             if (isViewCheckedOnly && !isChecked) {
                 return; 
             }
@@ -211,12 +208,11 @@ function renderList() {
             grid.appendChild(card);
         });
 
-        // 5. 표시할 아이템이 있는 경우에만 그룹 제목과 그리드를 추가
         if (visibleItemCount > 0) {
             hasAnyItem = true;
             const title = document.createElement('h3');
             title.className = 'group-title';
-            // [카운트 표시] 그룹명 (체크수/전체수)
+            // 카운트 표시 (보유수량 / 전체수량)
             title.innerHTML = `${groupName} <span class="group-count">(${checkedCount}/${totalCount})</span>`;
             
             listContainer.appendChild(title);
@@ -247,16 +243,8 @@ function toggleCheck(id, cardElement) {
     }
     saveData();
     
-    // [추가] 체크 상태가 바뀌면, '체크한 것만 보기' 모드거나 카운트 갱신을 위해 리스트 다시 그리기
-    // UX상 바로 사라지는게 싫으면 아래 renderList()는 주석 처리하고 카운트만 별도로 갱신해야 하지만,
-    // 여기선 데이터 정확성을 위해 다시 그리는 방식을 택함.
-    if (isViewCheckedOnly) {
-        renderList();
-    } else {
-        // 전체 모드일 때는 카운트 숫자만 갱신하는게 좋지만 구현 단순화를 위해 전체 렌더링
-        // (성능 문제 생기면 최적화 가능)
-        renderList();
-    }
+    // 상태 변경 시 리스트 다시 그리기 (PC 반응성 개선)
+    renderList();
 }
 
 function saveData() { localStorage.setItem(`nongdam_${currentTab}`, JSON.stringify([...checkedItems[currentTab]])); }
@@ -278,9 +266,9 @@ function resetFilters() {
     document.querySelectorAll('.flag-btn, .char-btn, .text-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('button[onclick*="all"]').forEach(btn => btn.classList.add('active'));
     
-    // [추가] 체크한 것만 보기 옵션도 초기화
     isViewCheckedOnly = false;
-    document.getElementById('viewCheckedOnly').checked = false;
+    const chk = document.getElementById('viewCheckedOnly');
+    if(chk) chk.checked = false;
 
     renderList();
 }
@@ -306,12 +294,9 @@ function toggleNickCheck() {
     }
 }
 
-// [추가] 스크롤 시 탑 버튼 표시/숨김
 function scrollFunction() {
-    // mainContent의 스크롤 위치 감지
     if (mainContent.scrollTop > 300) {
         scrollTopBtn.style.display = "block";
-        // 약간의 애니메이션 효과 (opacity)
         setTimeout(() => scrollTopBtn.style.opacity = "1", 10);
     } else {
         scrollTopBtn.style.opacity = "0";
@@ -319,7 +304,6 @@ function scrollFunction() {
     }
 }
 
-// [추가] 탑 버튼 클릭 시 맨 위로
 function scrollToTop() {
     mainContent.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -331,9 +315,6 @@ async function generateImage(mode = 'all') {
     if (mode === 'all') {
         sourceData = productData;
     } else {
-        // [수정] 현재 페이지 저장 시, '체크한 것만 보기' 필터 상태와 상관없이
-        // 현재 사이드바 필터(국가/캐릭터)에 맞는 데이터 전체를 대상으로 함
-        // (보이는 것만 저장하려면 getFilteredData() 사용 후 isViewCheckedOnly 체크 로직 추가 가능)
         sourceData = getFilteredData();
     }
 
@@ -373,8 +354,8 @@ async function generateImage(mode = 'all') {
     const gap = 30, padding = 60;
     
     const headerH = 160; 
-    const titleY = 60;   
-    const nickY = 115;   
+    const titleY = 60;    
+    const nickY = 115;    
 
     const rows = Math.ceil(items.length / cols);
 
@@ -438,7 +419,7 @@ async function generateImage(mode = 'all') {
         roundRect(ctx, x, y, cardW, cardH, 20);
         ctx.fill();
         
-        // 카드 테두리: 항상 회색(#eae8e4)
+        // 카드 테두리
         ctx.shadowColor = "transparent";
         ctx.strokeStyle = "#eae8e4"; 
         ctx.lineWidth = 2;
@@ -473,7 +454,6 @@ async function generateImage(mode = 'all') {
         }
 
         if (showPrice) {
-            // 가격표 색상 #b2bec3 고정
             ctx.fillStyle = "#b2bec3";
             ctx.font = "bold 18px 'Gowun Dodum', sans-serif";
             const priceY = showName ? y + 390 : y + 330; 
@@ -489,7 +469,6 @@ async function generateImage(mode = 'all') {
     btn.disabled = false;
 }
 
-// 모바일 사이드바 토글 함수
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const overlay = document.querySelector('.overlay');

@@ -350,28 +350,31 @@ body.theme-wish .item-price {
     .close-sidebar-btn { display: none; }
 
     .main-content { width: 100%; overflow-y: auto; }
-    .list-container { padding-top: 15px; }
+    
+    /* [수정] 모바일에서 리스트 컨테이너 여백 더 확보 */
+    .list-container { padding-top: 10px; }
+    
     .group-title { margin-top: 20px; font-size: 18px; }
     
-    /* [수정] 모바일 3단 그리드 적용 */
+    /* 모바일 3단 그리드 적용 */
     .items-grid { 
         display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개 강제 */
-        gap: 8px; /* 간격을 좁힘 (20px -> 8px) */
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 8px; 
     }
 
-    /* [수정] 모바일에서 카드 내용물 크기 축소 */
-    .item-info { padding: 8px 4px; } /* 패딩 축소 */
+    /* 모바일에서 카드 내용물 크기 축소 */
+    .item-info { padding: 8px 4px; } 
     
     .item-name { 
-        font-size: 12px; /* 글자 크기 축소 (14px -> 12px) */
-        height: 50px; /* 높이 축소 (63px -> 50px) */
+        font-size: 12px; 
+        height: 50px; 
         margin-bottom: 4px;
         line-height: 1.3;
     }
     
     .item-price { 
-        font-size: 11px; /* 가격 폰트 축소 */
+        font-size: 11px; 
         padding: 2px 6px;
     }
 
@@ -382,6 +385,11 @@ body.theme-wish .item-price {
         backdrop-filter: blur(2px);
     }
     .overlay.active { display: block; }
+    
+    /* [수정] 모바일에서 체크박스 버튼이 헤더에 가리지 않게 상단 여백 추가 */
+    .top-controls {
+        padding-top: 20px;
+    }
 }
 
 @media (min-width: 769px) {
@@ -391,7 +399,7 @@ body.theme-wish .item-price {
     .overlay { display: none; }
 }
 
-/* --- [추가] 위시 리스트 내의 보유 아이템 스타일 (회색 잠금) --- */
+/* 위시 리스트 내의 보유 아이템 스타일 (회색 잠금) */
 .item-card.owned-in-wish {
     border-color: #b2bec3 !important; /* 테두리 회색 */
     background-color: #f1f2f6 !important; /* 배경 연한 회색 */
@@ -411,7 +419,7 @@ body.theme-wish .item-price {
     color: #b2bec3 !important;
 }
 
-/* [추가] 상단 컨트롤 (체크한 것만 보기) */
+/* 상단 컨트롤 (체크한 것만 보기) */
 .top-controls {
     display: flex;
     justify-content: flex-end; /* 오른쪽 정렬 */
@@ -446,7 +454,7 @@ body.theme-wish .item-price {
     cursor: pointer;
 }
 
-/* [추가] 그룹 타이틀 옆 숫자 (2/5) 스타일 */
+/* 그룹 타이틀 옆 숫자 스타일 */
 .group-count {
     font-size: 16px;
     color: #b2bec3; /* 연한 회색으로 작게 표시 */
@@ -454,7 +462,7 @@ body.theme-wish .item-price {
     margin-left: 5px;
 }
 
-/* [추가] 맨 위로 가기 버튼 (플로팅 버튼) */
+/* 맨 위로 가기 버튼 (플로팅 버튼) */
 #scrollTopBtn {
     display: none; /* 기본 숨김 (스크롤 시 등장) */
     position: fixed;
