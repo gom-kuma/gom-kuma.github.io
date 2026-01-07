@@ -159,8 +159,7 @@ function renderList() {
         let totalCount = groupItems.length;
         let checkedCount = 0;
 
-        // [수정] 무조건 '보유(owned)' 리스트에 있는 것만 카운트
-        // 위시리스트 탭이어도 보유한 수량만 표시됨
+        // 카운트 계산: 보유 수량만 계산
         groupItems.forEach(item => {
             if (checkedItems.owned.has(item.id)) {
                 checkedCount++;
@@ -176,42 +175,52 @@ function renderList() {
             let isChecked = false;
             let isLocked = false; 
 
+            // 1. 체크 여부 및 잠금(회색) 상태 판단
             if (currentTab === 'owned') {
                 isChecked = isOwned;
             } else {
+                // 위시 탭
                 if (isOwned) {
                     isChecked = true;
-                    isLocked = true; 
+                    isLocked = true; // 보유중이면 잠금 처리 (회색)
                 } else {
                     isChecked = checkedItems.wish.has(item.id);
                 }
             }
 
-            // '체크한 것만 보기' 필터링 (표시 여부 결정)
-            if (isViewCheckedOnly && !isChecked) {
-                return; 
-            }
-
-            // [수정 핵심] '모아보기' 모드에서는 체크된 아이템이라도
-            // 시각적으로는 원본(체크 안 된 상태)처럼 보여주고 클릭을 막음
+            // 2. '모아보기' 필터링 로직 (핵심 수정!)
             if (isViewCheckedOnly) {
-                isChecked = false; // 시각적 체크 해제
-                isLocked = false; // 락 해제 (보유 중인 위시템도 원본으로 감상)
+                if (currentTab === 'wish') {
+                    // [수정] 위시리스트 모아보기에서는 '보유한 아이템(isOwned)'은 제외!
+                    // 오직 '순수 위시(wish Set에 있는)' 아이템만 통과
+                    if (isOwned) return; 
+                    if (!checkedItems.wish.has(item.id)) return;
+                } else {
+                    // 보유 탭: 체크 안 된거 제외
+                    if (!isChecked) return;
+                }
+                
+                // 모아보기 통과한 아이템들은 '원본' 처럼 보이기 위해 체크/락 해제
+                isChecked = false;
+                isLocked = false;
+            } else {
+                // 일반 모드: 체크 안 된거 숨기지 않음 (모아보기 아닐 때)
             }
 
             visibleItemCount++;
 
+            // 3. 카드 클래스 부여
+            // isLocked가 true면 'owned-in-wish' 클래스가 붙어서 회색 처리됨
             const card = document.createElement('div');
             card.className = `item-card ${isChecked ? 'checked' : ''} ${isLocked ? 'owned-in-wish' : ''}`;
             
-            // [수정] 모아보기 모드일 때는 클릭 이벤트 아예 없음 (감상용)
+            // 4. 클릭 이벤트 (모아보기 상태면 클릭 불가)
             if (!isViewCheckedOnly) {
                 card.onclick = () => {
                     if (isLocked) return; 
                     toggleCheck(item.id, card);
                 };
             } else {
-                // 모아보기 모드: 커서 기본으로 변경
                 card.style.cursor = 'default';
             }
 
@@ -232,7 +241,6 @@ function renderList() {
             hasAnyItem = true;
             const title = document.createElement('h3');
             title.className = 'group-title';
-            // 카운트 표시 (보유수량 / 전체수량)
             title.innerHTML = `${groupName} <span class="group-count">(${checkedCount}/${totalCount})</span>`;
             
             listContainer.appendChild(title);
@@ -262,8 +270,6 @@ function toggleCheck(id, cardElement) {
         cardElement.classList.add('checked'); 
     }
     saveData();
-    
-    // 상태 변경 시 리스트 다시 그리기
     renderList();
 }
 

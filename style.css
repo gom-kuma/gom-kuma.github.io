@@ -192,7 +192,7 @@ body.theme-wish .sub-btn.active { color: white; }
 
 .main-content { flex: 1; padding: 0; overflow-y: auto; background-color: var(--bg-color); position: relative; }
 
-/* [PC 수정] 상단 컨트롤: 왼쪽 정렬 + 하단 간격 줄임 */
+/* [PC] 상단 컨트롤: 왼쪽 정렬 + 하단 간격 줄임 */
 .top-controls {
     display: flex;
     justify-content: flex-start; /* PC 왼쪽 정렬 */
@@ -326,7 +326,7 @@ body.theme-wish .item-price {
     
     .app-container {
         flex-direction: column;
-        /* [수정] 스크롤 버그 해결: 높이를 자동으로 하면 body overflow hidden때문에 짤림. calc로 고정 */
+        /* [수정] 스크롤 버그 해결: 60px(헤더) 빼고 계산 */
         margin-top: 60px;
         height: calc(100vh - 60px); 
     }
@@ -462,10 +462,10 @@ body.theme-wish .item-price {
     }
     .overlay.active { display: block; }
     
-    /* [모바일] 상단 컨트롤: 누나가 수정한 디자인 유지 + 오른쪽 정렬 */
+    /* [수정] 모바일 상단 컨트롤 여백 추가 및 오른쪽 정렬 */
     .top-controls {
-        padding-top: 25px; 
-        justify-content: flex-end; /* 모바일 오른쪽 정렬 */
+        padding-top: 30px; /* 헤더에 가리지 않게 충분히 내림 */
+        justify-content: flex-end; /* 오른쪽 정렬 */
     }
 
     /* 모바일에서는 버튼 위치 살짝 조정 */
@@ -483,4 +483,24 @@ body.theme-wish .item-price {
     .sidebar-mobile-header { display: none; }
     .close-sidebar-btn { display: none; }
     .overlay { display: none; }
+}
+
+/* 위시 리스트 내의 보유 아이템 스타일 (회색 잠금) */
+.item-card.owned-in-wish {
+    border-color: #b2bec3 !important; /* 테두리 회색 */
+    background-color: #f1f2f6 !important; /* 배경 연한 회색 */
+    cursor: default; /* 클릭 커서 없애기 */
+    opacity: 0.8; /* 살짝 투명하게 해서 힘 빼기 */
+}
+
+/* 잠금 아이템의 체크마크 색상도 회색으로 */
+.item-card.owned-in-wish .check-overlay::after {
+    background: #b2bec3 !important;
+    box-shadow: none; /* 그림자 제거해서 플랫하게 */
+}
+
+/* 잠금 아이템의 가격표도 회색조로 */
+.item-card.owned-in-wish .item-price {
+    background: #e2e6ea !important;
+    color: #b2bec3 !important;
 }
