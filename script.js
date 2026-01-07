@@ -19,7 +19,8 @@ const listContainer = document.getElementById('listContainer');
 const mainContent = document.getElementById('mainContent'); 
 const scrollTopBtn = document.getElementById('scrollTopBtn'); 
 
-// [추가] 강제 스타일 주입 함수 (CSS 파일 무시하고 회색 체크마크 강제 적용)
+// [중요] 강제 스타일 주입 함수 업데이트
+// 위시리스트 내 보유 아이템(회색)은 무조건 '✔' 표시가 뜨도록 함
 function injectGrayStyle() {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -29,11 +30,11 @@ function injectGrayStyle() {
             background-color: #f1f2f6 !important;
             cursor: default !important;
         }
-        /* 체크마크 원 색상: 회색으로 강제 변경 */
+        /* 체크마크 원 색상: 회색으로 강제 변경 + 하트가 아닌 체크표시 강제 */
         .item-card.owned-in-wish .check-overlay::after {
             background-color: #b2bec3 !important;
             box-shadow: none !important;
-            content: '✔' !important; /* 체크 표시 강제 */
+            content: '✔' !important; /* 하트가 되지 않게 강제 */
         }
         /* 가격표 색상 변경 */
         .item-card.owned-in-wish .item-price {
@@ -216,10 +217,7 @@ function renderList() {
             } else {
                 // [위시 탭]
                 if (isOwned) {
-                    // ★ 핵심 수정 ★
-                    // checked: 체크표시(✔)를 나오게 함
-                    // owned-in-wish: 회색 스타일을 적용함
-                    // 이 두 개를 같이 줘야 '회색 체크'가 됨
+                    // ★핵심★ 체크 표시도 나와야 하고, 회색 스타일도 먹어야 함
                     displayClass = 'checked owned-in-wish'; 
                     isLocked = true;
                 } else if (isWished) {
@@ -233,7 +231,7 @@ function renderList() {
                 if (currentTab === 'owned') {
                     if (!isOwned) showItem = false;
                 } else {
-                    // 위시 모아보기: 보유한 아이템(isOwned)은 숨김! 순수 위시만 표시
+                    // 위시 모아보기: 보유한 아이템(isOwned)은 숨김
                     if (isOwned) showItem = false; 
                     if (!isWished) showItem = false;
                 }
@@ -252,6 +250,12 @@ function renderList() {
             const card = document.createElement('div');
             card.className = `item-card ${displayClass}`;
             
+            // ★[안전장치]★ CSS 우선순위 문제 원천 차단: JS로 강제 회색 스타일 주입
+            if (isLocked && !isViewCheckedOnly) {
+                card.style.borderColor = "#b2bec3";
+                card.style.backgroundColor = "#f1f2f6";
+            }
+
             // 3. 클릭 이벤트
             if (!isViewCheckedOnly) {
                 card.onclick = () => {

@@ -11,6 +11,7 @@
     --bg-color: #fafafa;
     --owned-color: #aeb4d1; 
     --wish-color: #8fb3d1; 
+    --heart-color: #e77277; /* [추가] 하트 색상 (분홍) */
     --text-color: #2d3436;
     --border-color: #f5f5f5;
     --sidebar-width: 350px; 
@@ -75,7 +76,7 @@ body.theme-wish .tab-btn:not(.active) { color: #a1c2dd; }
 
 .tab-btn.active { background: white; color: var(--theme-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold; }
 
-/* [추가] 사이드바 내부 모아보기 버튼 스타일 */
+/* 사이드바 내부 모아보기 버튼 스타일 */
 .sidebar-top-controls {
     display: flex;
     justify-content: center; /* 가운데 정렬 */
@@ -231,8 +232,44 @@ body.theme-wish .item-card.checked { background: #dbeef8; }
 .item-img-wrapper { width: 100%; aspect-ratio: 1/1; position: relative; background: #fff; border-bottom: 1px solid #f8f9fa; }
 .item-img-wrapper img { width: 100%; height: 100%; object-fit: contain; padding: 15px; box-sizing: border-box; }
 
-.check-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(2px); }
-.check-overlay::after { content: '✔'; font-size: 40px; color: white; font-weight: bold; background: var(--theme-color); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+/* [수정] 체크 오버레이 스타일 변경 (블러 제거, 투명 배경) */
+.check-overlay { 
+    position: absolute; 
+    top: 0; left: 0; width: 100%; height: 100%; 
+    display: flex; 
+    align-items: flex-start; /* 상단 정렬 */
+    justify-content: flex-end; /* 우측 정렬 */
+    opacity: 0; 
+    transition: 0.2s; 
+    background: transparent; /* 배경 투명하게 (이미지 잘 보이게) */
+    backdrop-filter: none; /* 블러 제거 */
+    pointer-events: none; /* 오버레이가 클릭 방해 안 하게 */
+}
+
+/* [수정] 체크 마크 아이콘 스타일 (우측 상단 작게) */
+.check-overlay::after { 
+    content: '✔'; 
+    font-size: 16px; /* 아이콘 크기 축소 */
+    color: white; 
+    font-weight: bold; 
+    background: var(--theme-color); 
+    border-radius: 50%; 
+    width: 28px; /* 원 크기 축소 */
+    height: 28px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); 
+    margin: 10px; /* 우측 상단 여백 */
+}
+
+/* [추가] 위시리스트 탭에서는 체크 표시를 하트(♥)로 변경 (색상: 분홍) */
+body.theme-wish .item-card.checked:not(.owned-in-wish) .check-overlay::after {
+    content: '♥';
+    background-color: var(--heart-color); /* 분홍색 */
+    padding-top: 2px; /* 하트 위치 미세 조정 */
+}
+
 .item-card.checked .check-overlay { opacity: 1; }
 
 .item-info { padding: 15px 10px; text-align: center; }
@@ -296,7 +333,6 @@ body.theme-wish .item-price {
     margin-left: 5px;
 }
 
-
 /* [수정] 맨 위로 가기 버튼: 하얀색 원형, 항상 표시 */
 #scrollTopBtn {
     display: block !important; /* 항상 표시 */
@@ -325,13 +361,13 @@ body.theme-wish .item-price {
     transition: 0.3s;
 }
 
-/* [수정] 내부 이미지 스타일: 패딩을 줘서 꽉 차지 않게 조절 */
+/* 내부 이미지 스타일 (패딩 추가로 크기 조절) */
 #scrollTopBtn img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    border-radius: 50%; 
-    padding: 12px; /* 여기 패딩을 12px 정도 주면 이미지가 적당히 작아져서 예뻐! */
+    border-radius: 50%; /* 이미지도 둥글게 */
+    padding: 12px; /* 이미지 꽉 차는 문제 해결 */
     box-sizing: border-box;
 }
 
@@ -398,7 +434,10 @@ body.theme-wish .item-price {
         top: 0; right: -100%; left: auto;
         width: 85%; max-width: 320px;
         height: 100vh;
-        z-index: 1000;
+        
+        /* [수정] 사이드바 레이어 순서 최상위로 올리기 */
+        z-index: 10000; 
+        
         transition: right 0.3s ease-in-out;
         box-shadow: -4px 0 15px rgba(0,0,0,0.1);
         display: flex; flex-direction: column;
@@ -450,11 +489,11 @@ body.theme-wish .item-price {
     
     .close-sidebar-btn { display: none; }
 
-    /* [모바일] 메인 콘텐츠 상단 여백 추가 확보 */
+    /* [수정] 모바일 메인 콘텐츠 상단 여백 추가 (화면 잘림 방지) */
     .main-content { 
         width: 100%; 
         overflow-y: auto; 
-        padding-top: 5px; 
+        padding-top: 80px; /* 헤더 높이 60px + 여백 20px */
     }
     
     .list-container { padding-top: 0; }
@@ -497,4 +536,24 @@ body.theme-wish .item-price {
     .sidebar-mobile-header { display: none; }
     .close-sidebar-btn { display: none; }
     .overlay { display: none; }
+}
+
+/* 위시 리스트 내의 보유 아이템 스타일 (회색 잠금) */
+.item-card.owned-in-wish {
+    border-color: #b2bec3 !important; /* 테두리 회색 */
+    background-color: #f1f2f6 !important; /* 배경 연한 회색 */
+    cursor: default; /* 클릭 커서 없애기 */
+    opacity: 0.8; /* 살짝 투명하게 해서 힘 빼기 */
+}
+
+/* 잠금 아이템의 체크마크 색상도 회색으로 */
+.item-card.owned-in-wish .check-overlay::after {
+    background: #b2bec3 !important;
+    box-shadow: none; /* 그림자 제거해서 플랫하게 */
+}
+
+/* 잠금 아이템의 가격표도 회색조로 */
+.item-card.owned-in-wish .item-price {
+    background: #e2e6ea !important;
+    color: #b2bec3 !important;
 }
