@@ -1,4 +1,4 @@
-// script.js (구글 시트 연동 URL 수정본)
+// script.js (기능 추가 최종 버전)
 
 // [설정] 구글 스프레드시트 ID
 const SHEET_ID = '1hTPuwTZkRnPVoo5GUUC1fhuxbscwJrLdWVG-eHPWaIM';
@@ -7,7 +7,8 @@ const SHEET_ID = '1hTPuwTZkRnPVoo5GUUC1fhuxbscwJrLdWVG-eHPWaIM';
 let productData = [];
 
 let currentTab = 'owned'; 
-let filters = { country: 'all', character: 'all' }; // 회사 필터 제외됨
+let filters = { country: 'all', character: 'all' }; 
+let isViewCheckedOnly = false; // [추가] 체크한 것만 보기 상태 변수
 
 let checkedItems = {
     owned: new Set(JSON.parse(localStorage.getItem('nongdam_owned') || '[]')),
@@ -15,30 +16,31 @@ let checkedItems = {
 };
 
 const listContainer = document.getElementById('listContainer');
+const mainContent = document.getElementById('mainContent'); // 스크롤 감지용
+const scrollTopBtn = document.getElementById('scrollTopBtn'); // 탑 버튼
 
 // 초기화 함수
 async function init() {
     await fetchData(); 
     renderList();
     updateTabUI();
+    
+    // [추가] 스크롤 이벤트 리스너 등록
+    mainContent.addEventListener('scroll', scrollFunction);
 }
 
-// [수정] 구글 시트 CSV 데이터 가져오기 (URL 방식 변경)
+// 구글 시트 CSV 데이터 가져오기
 async function fetchData() {
-    // 1. export?format=csv 방식이 더 안정적임
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     
     try {
         const response = await fetch(url);
-        
-        // 2. 응답이 실패했거나 텍스트가 아니면 에러 처리
         if (!response.ok) throw new Error("네트워크 응답이 올바르지 않습니다.");
         
         const text = await response.text();
         productData = parseCSV(text);
         
         console.log("데이터 로드 성공:", productData.length + "개");
-        
     } catch (error) {
         console.error("데이터 로드 실패:", error);
         listContainer.innerHTML = `<div style="text-align:center; padding:50px; color:#aaa; line-height:1.6;">
@@ -51,7 +53,6 @@ async function fetchData() {
 // CSV 파싱 함수
 function parseCSV(csvText) {
     const rows = csvText.split('\n').map(row => {
-        // 따옴표로 묶인 쉼표 처리
         const regex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
         let columns = [];
         let match;
@@ -72,7 +73,6 @@ function parseCSV(csvText) {
         const item = {};
         headers.forEach((header, index) => {
             let value = row[index];
-            // 데이터 그대로 사용
             item[header] = value;
         });
         
@@ -108,20 +108,27 @@ function updateTabUI() {
     document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.toggle('active', btn.dataset.tab === currentTab); });
 }
 
+// [추가] 체크한 것만 모아보기 토글 함수
+function toggleViewChecked() {
+    const checkbox = document.getElementById('viewCheckedOnly');
+    isViewCheckedOnly = checkbox.checked;
+    renderList();
+}
+
+// [핵심 수정] 리스트 렌더링 함수 (카운트 & 필터링 로직 추가)
 function renderList() {
     listContainer.innerHTML = '';
+    
+    // 1. 현재 필터(국가/캐릭터)에 맞는 데이터 가져오기
     const filteredData = getFilteredData(); 
 
     if (filteredData.length === 0) {
-        // 데이터가 아직 로드되지 않았거나 필터 결과가 없을 때
-        if (productData.length === 0) {
-             // fetchData에서 에러 처리를 하므로 여기선 대기
-             return; 
-        }
+        if (productData.length === 0) return; 
         listContainer.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa;">해당하는 농담곰이 없어요 😢</div>';
         return;
     }
 
+    // 2. 그룹핑 (마스코트, 기본 등)
     const grouped = {};
     filteredData.forEach(item => {
         let groupKey;
@@ -130,21 +137,37 @@ function renderList() {
         } else {
             groupKey = item.group;
         }
-
         if (!grouped[groupKey]) grouped[groupKey] = [];
         grouped[groupKey].push(item);
     });
 
+    // 3. 그룹별 렌더링
+    let hasAnyItem = false; // 화면에 표시된 아이템이 하나라도 있는지 확인
+
     Object.keys(grouped).forEach(groupName => {
-        const title = document.createElement('h3');
-        title.className = 'group-title';
-        title.innerText = groupName;
-        listContainer.appendChild(title);
+        const groupItems = grouped[groupName];
         
+        // [카운트] 이 그룹의 전체 개수와 체크된 개수 계산
+        let totalCount = groupItems.length;
+        let checkedCount = 0;
+
+        // 먼저 체크된 개수부터 계산 (화면 표시 여부와 상관없이 통계용)
+        groupItems.forEach(item => {
+            const isOwned = checkedItems.owned.has(item.id);
+            if (currentTab === 'owned') {
+                if (isOwned) checkedCount++;
+            } else {
+                // 위시탭: 보유(잠금) 상태이거나 위시에 체크된 경우
+                if (isOwned || checkedItems.wish.has(item.id)) checkedCount++;
+            }
+        });
+
+        // 4. 아이템 카드 생성 (DOM 요소)
         const grid = document.createElement('div');
         grid.className = 'items-grid';
-        
-        grouped[groupName].forEach(item => {
+        let visibleItemCount = 0;
+
+        groupItems.forEach(item => {
             const isOwned = checkedItems.owned.has(item.id); 
             let isChecked = false;
             let isLocked = false; 
@@ -159,6 +182,13 @@ function renderList() {
                     isChecked = checkedItems.wish.has(item.id);
                 }
             }
+
+            // [필터링] '체크한 것만 보기'가 켜져있는데 체크 안 된 항목이면 건너뜀
+            if (isViewCheckedOnly && !isChecked) {
+                return; 
+            }
+
+            visibleItemCount++;
 
             const card = document.createElement('div');
             card.className = `item-card ${isChecked ? 'checked' : ''} ${isLocked ? 'owned-in-wish' : ''}`;
@@ -180,8 +210,23 @@ function renderList() {
             `;
             grid.appendChild(card);
         });
-        listContainer.appendChild(grid);
+
+        // 5. 표시할 아이템이 있는 경우에만 그룹 제목과 그리드를 추가
+        if (visibleItemCount > 0) {
+            hasAnyItem = true;
+            const title = document.createElement('h3');
+            title.className = 'group-title';
+            // [카운트 표시] 그룹명 (체크수/전체수)
+            title.innerHTML = `${groupName} <span class="group-count">(${checkedCount}/${totalCount})</span>`;
+            
+            listContainer.appendChild(title);
+            listContainer.appendChild(grid);
+        }
     });
+
+    if (!hasAnyItem && isViewCheckedOnly) {
+        listContainer.innerHTML = '<div style="text-align:center; padding:50px; color:#aaa;">체크된 인형이 없습니다.</div>';
+    }
 }
 
 function getFilteredData() {
@@ -193,8 +238,25 @@ function getFilteredData() {
 }
 
 function toggleCheck(id, cardElement) {
-    if (checkedItems[currentTab].has(id)) { checkedItems[currentTab].delete(id); cardElement.classList.remove('checked'); } else { checkedItems[currentTab].add(id); cardElement.classList.add('checked'); }
+    if (checkedItems[currentTab].has(id)) { 
+        checkedItems[currentTab].delete(id); 
+        cardElement.classList.remove('checked'); 
+    } else { 
+        checkedItems[currentTab].add(id); 
+        cardElement.classList.add('checked'); 
+    }
     saveData();
+    
+    // [추가] 체크 상태가 바뀌면, '체크한 것만 보기' 모드거나 카운트 갱신을 위해 리스트 다시 그리기
+    // UX상 바로 사라지는게 싫으면 아래 renderList()는 주석 처리하고 카운트만 별도로 갱신해야 하지만,
+    // 여기선 데이터 정확성을 위해 다시 그리는 방식을 택함.
+    if (isViewCheckedOnly) {
+        renderList();
+    } else {
+        // 전체 모드일 때는 카운트 숫자만 갱신하는게 좋지만 구현 단순화를 위해 전체 렌더링
+        // (성능 문제 생기면 최적화 가능)
+        renderList();
+    }
 }
 
 function saveData() { localStorage.setItem(`nongdam_${currentTab}`, JSON.stringify([...checkedItems[currentTab]])); }
@@ -215,6 +277,11 @@ function resetFilters() {
     filters = { country: 'all', character: 'all' }; 
     document.querySelectorAll('.flag-btn, .char-btn, .text-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('button[onclick*="all"]').forEach(btn => btn.classList.add('active'));
+    
+    // [추가] 체크한 것만 보기 옵션도 초기화
+    isViewCheckedOnly = false;
+    document.getElementById('viewCheckedOnly').checked = false;
+
     renderList();
 }
 
@@ -239,6 +306,24 @@ function toggleNickCheck() {
     }
 }
 
+// [추가] 스크롤 시 탑 버튼 표시/숨김
+function scrollFunction() {
+    // mainContent의 스크롤 위치 감지
+    if (mainContent.scrollTop > 300) {
+        scrollTopBtn.style.display = "block";
+        // 약간의 애니메이션 효과 (opacity)
+        setTimeout(() => scrollTopBtn.style.opacity = "1", 10);
+    } else {
+        scrollTopBtn.style.opacity = "0";
+        setTimeout(() => scrollTopBtn.style.display = "none", 300);
+    }
+}
+
+// [추가] 탑 버튼 클릭 시 맨 위로
+function scrollToTop() {
+    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // [이미지 생성 함수]
 async function generateImage(mode = 'all') {
     let sourceData = [];
@@ -246,6 +331,9 @@ async function generateImage(mode = 'all') {
     if (mode === 'all') {
         sourceData = productData;
     } else {
+        // [수정] 현재 페이지 저장 시, '체크한 것만 보기' 필터 상태와 상관없이
+        // 현재 사이드바 필터(국가/캐릭터)에 맞는 데이터 전체를 대상으로 함
+        // (보이는 것만 저장하려면 getFilteredData() 사용 후 isViewCheckedOnly 체크 로직 추가 가능)
         sourceData = getFilteredData();
     }
 
