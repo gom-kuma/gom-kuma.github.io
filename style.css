@@ -229,24 +229,24 @@ body.theme-wish .sub-btn.active { color: white; }
 .item-card.checked { border: 2px solid var(--theme-color); }
 
 /* 보유(기본) 모드일 때 체크된 카드 배경색 (연보라) */
-body:not(.theme-wish) .item-card.checked { background: #aeb4d126; /* 연한 보라색 */ }
+body:not(.theme-wish) .item-card.checked { background: #aeb4d142; /* 연한 보라색 */ }
 
 /* [추가] 위시 모드일 때만 체크된 카드 배경색 변경 */
 body.theme-wish .item-card.checked { background: #fff0f342; /* 핑크 배경 */ }
 
-/* [수정] 이미지 래퍼 하단 테두리 제거 & 이미지 패딩 조절 */
+/* [수정] 이미지 래퍼 하단 테두리 제거 */
 .item-img-wrapper { 
     width: 100%; 
     aspect-ratio: 1/1; 
     position: relative; 
     background: #fff; 
-    border-bottom: none; /* 테두리 제거 */
+    border-bottom: none; 
 }
 .item-img-wrapper img { 
     width: 100%; 
     height: 100%; 
     object-fit: contain; 
-    padding: 10px; /* 패딩 살짝 감소 (15px -> 10px) */
+    padding: 10px; /* PC 기본 패딩 */
     box-sizing: border-box; 
 }
 
@@ -292,7 +292,7 @@ body.theme-wish .item-card.checked:not(.owned-in-wish) .check-overlay::after {
 
 /* [수정] 카드 정보 영역 패딩 감소 */
 .item-info { 
-    padding: 10px 10px; /* 위아래 패딩 감소 (15px -> 10px) */
+    padding: 10px 10px; 
     text-align: center; 
 }
 
@@ -578,25 +578,30 @@ body:not(.theme-wish) .view-check-label:hover { background: #f1f2f6; }
     .main-content { 
         width: 100%; 
         overflow-y: auto; 
-        padding-top: 80px; /* 헤더 높이 60px + 여백 20px */
+        padding-top: 10px; /* 헤더 높이 60px + 여백 20px */
     }
     
     .list-container { padding-top: 0; }
     
     .group-title { margin-top: 20px; font-size: 18px; }
     
-    /* 모바일 3단 그리드 적용 */
+    /* 모바일 3단 그리드 유지 (3fr) + 간격 축소 */
     .items-grid { 
         display: grid;
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px; 
+        grid-template-columns: repeat(3, 1fr); /* 3단 유지 */
+        gap: 5px; /* 간격 축소 */
     }
 
     /* [수정] 모바일에서 카드 내용물 크기 축소 및 패딩 조절 */
     .item-info { 
-        padding: 6px 4px; /* 위아래 패딩 조금 더 감소 */
+        padding: 5px 0; /* 패딩 최소화 */
     } 
     
+    /* [수정] 모바일에서 이미지 패딩 거의 제거 (꽉 차게) */
+    .item-img-wrapper img {
+        padding: 2px; 
+    }
+
     .item-name { 
         font-size: 12px; 
         height: 50px; 
