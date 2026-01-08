@@ -120,6 +120,12 @@ function switchTab(tab) {
         viewCheckText.innerText = tab === 'owned' ? "내 콜렉션 모아보기" : "내 위시 모아보기";
     }
 
+    // 탭 전환 시 타이틀 입력창 값 변경
+    const titleInput = document.getElementById('customTitle');
+    if (titleInput) {
+        titleInput.value = tab === 'owned' ? '농담곰 인형 보유 리스트' : '농담곰 인형 위시 리스트';
+    }
+
     const topImg = document.getElementById('scrollTopImg');
     if (topImg) {
         topImg.src = tab === 'owned' ? 'img/top_own.png' : 'img/top_wish.png';
