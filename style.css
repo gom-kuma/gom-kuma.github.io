@@ -592,11 +592,8 @@ body:not(.theme-wish) .view-check-label:hover { background: #f1f2f6; }
         gap: 5px; /* 간격 축소 */
     }
 
-    /* [수정] 모바일에서 카드 내용물 크기 축소 및 패딩 조절 */
-    .item-info { 
-        padding: 5px 0; /* 패딩 최소화 */
-    } 
-    
+
+
     /* [수정] 모바일에서 이미지 패딩 거의 제거 (꽉 차게) */
     .item-img-wrapper img {
         padding: 2px; 
