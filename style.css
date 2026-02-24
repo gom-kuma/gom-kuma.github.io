@@ -13,8 +13,8 @@
 }
 
 :root {
-    --primary-color: #182558; /* 요네즈 켄시 남색 테마 */
-    --bg-color: #fafafa;
+    --primary-color: #a197bf; 
+    --bg-color: #faf9fc;
     --card-bg: #ffffff;
     --text-color: #333;
 }
