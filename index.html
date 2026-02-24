@@ -3,149 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>농담곰 인형 체크 리스트</title>
+    <title>농담곰 인형 콜렉션</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="mobile-header">
-        <div class="header-left">
-            <h1 class="mobile-logo">농담곰 인형 리스트</h1>
-            <span id="mobileModeBadge" class="mode-badge">보유</span>
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <header>
+        <div class="header-top-row">
+            <h1 onclick="goHome()">농담곰 인형 콜렉션</h1>
         </div>
-        
-        <button class="mobile-menu-btn" onclick="toggleSidebar()">
-            <span class="menu-icon">☰</span>
-        </button>
+        <div id="navMenuContainer" class="filter-section pc-filters">
+            </div>
     </header>
 
-    <div class="overlay" onclick="toggleSidebar()"></div>
-
-    <div class="app-container">
-        
-        <aside class="sidebar">
-            <div class="sidebar-mobile-header">
-                <div class="tab-container mobile-tab-container">
-                    <button class="tab-btn active" data-tab="owned">보유</button>
-                    <button class="tab-btn" data-tab="wish">위시</button>
-                </div>
-                <button class="sidebar-close-icon" onclick="toggleSidebar()">✕</button>
+    <div id="sidebar" class="sidebar">
+        <div id="sidebarContent" class="filter-section mobile-filters">
+            <h2 class="sidebar-title">필터 및 메뉴</h2>
             </div>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-            <div class="sidebar-title">농담곰 인형 리스트</div>
-            
-            <div class="tab-container pc-tab-container">
-                <button class="tab-btn active" data-tab="owned">보유</button>
-                <button class="tab-btn" data-tab="wish">위시</button>
-            </div>
+    <main>
+        <div id="listContainer">
+            <div class="status-msg">데이터를 불러오는 중...</div>
+        </div>
 
-            <div class="sidebar-top-controls">
-                <label class="view-check-label">
-                    <input type="checkbox" id="viewCheckedOnly" onchange="toggleViewChecked()"> 
-                    <span id="viewCheckText">내 콜렉션 모아보기</span>
-                </label>
-            </div>
-
-            <div class="filter-section">
-                <span class="filter-label">필터</span>
-                
-                <div class="filter-item-wrapper">
-                    <div class="filter-group">
-                        <button class="text-btn active" onclick="setFilter('country', 'all')">ALL</button>
-                        <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea')">
-                            <div class="overlay">한국</div>
-                        </div>
-                        <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan')">
-                            <div class="overlay">일본</div>
-                        </div>
-                        <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china')">
-                            <div class="overlay">중국</div>
-                        </div>
-                        <div class="flag-btn" style="background-image: url('img/icon_flag/flag_tw.png');" onclick="setFilter('country', 'taiwan')">
-                            <div class="overlay">대만</div>
-                        </div>
-                    </div>
+        <div id="previewContainer" style="display: none;">
+            <div class="preview-card">
+                <div class="preview-header-row">
+                    <div class="preview-label">수집 리스트 이미지 미리보기</div>
+                    <button class="action-btn download small-btn" onclick="downloadImage()">저장하기</button>
                 </div>
 
-                <div class="filter-item-wrapper">
-                    <div class="filter-group">
-                        <button class="text-btn active" onclick="setFilter('character', 'all')">ALL</button>
-                        <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma')">
-                            <div class="overlay">농담곰</div>
-                        </div>
-                        <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro')">
-                            <div class="overlay">두더지<br>고로케</div>
-                        </div>
-                        <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug')">
-                            <div class="overlay">퍼그 상</div>
-                        </div>
-                        <div class="char-btn" style="background-image: url('img/icon_characters/icon_ngn.png');" onclick="setFilter('character', 'ngn')">
-                            <div class="overlay">기타</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="filter-item-wrapper">
-                    <div class="filter-group">
-                        <button class="text-btn active" onclick="setFilter('group', 'all')">ALL</button>
-                        <button class="text-btn" onclick="setFilter('group', '마스코트')">마스코트</button>
-                        <button class="text-btn" onclick="setFilter('group', '쿠션')">쿠션</button>
-                        <button class="text-btn" onclick="setFilter('group', '인형')">인형</button>
-                        <button class="text-btn" onclick="setFilter('group', '잡화')">잡화</button>
-                    </div>
-                </div>
-            </div> 
-
-            <hr class="sidebar-divider">
-            
-            <div class="save-options">
-                <span class="filter-label">체크한 이미지 저장</span>
-                
-                <div class="option-row title-row" id="titleOptionRow">
-                    <label class="option-check title-label">
-                        <input type="checkbox" id="showTitle" checked> 타이틀
-                    </label>
-                    <input type="text" id="customTitle" class="custom-input title-input" value="농담곰 인형 보유 리스트">
-                </div>
-
-                <div class="option-row compact-row">
-                    <div id="textOptions" style="display:flex; gap:8px; align-items:center;">
-                        <label class="option-check">
-                            <input type="checkbox" id="showName" checked> 상품명
+                <div class="preview-controls-wrapper">
+                    <div class="control-row top-row">
+                        <label class="control-item">
+                            <input type="checkbox" id="optTitleCheck" checked> 타이틀
                         </label>
-                        <label class="option-check">
-                            <input type="checkbox" id="showPrice"> 가격
+                        <input type="text" id="optTitleInput" value="농담곰 인형 보유 리스트">
+                    </div>
+                    
+                    <div class="control-row bottom-row">
+                        <span class="control-label-text">표시 항목</span>
+                        <label class="control-item">
+                            <input type="checkbox" id="optNameKoCheck" checked> 상품명
+                        </label>
+                        <label class="control-item">
+                            <input type="checkbox" id="optPriceCheck"> 가격
+                        </label>
+                        <label class="control-item" style="margin-left: 10px; color: #ff9f43;">
+                            <input type="checkbox" id="simpleModeCheck" onchange="updateCollectionPreview()"> 간소화 모드(원형)
                         </label>
                     </div>
-
-                    <label class="option-check" style="margin-left: 5px; font-weight: bold;">
-                        <input type="checkbox" id="simpleMode" onchange="toggleSimpleModeUI()"> 간소화
-                    </label>
                 </div>
 
-                <div class="button-group" style="margin-top: 15px;">
-                    <button class="action-btn page-btn" id="genBtnCurrent" onclick="generateImage('current')" style="font-size: 13px; padding: 0;">현재 페이지 저장</button>
-                    <button class="action-btn" id="genBtnAll" onclick="generateImage('all')" style="font-size: 13px; padding: 0;">전체 페이지 저장</button>
+                <div class="preview-img-box">
+                    <img id="imgCollection" src="" alt="Collection Preview">
                 </div>
             </div>
-        </aside>
 
-        <main class="main-content" id="mainContent">
-            
-            <div id="listContainer" class="list-container">
-                <div style="text-align:center; padding:50px; color:#aaa;">데이터를 불러오는 중입니다...</div>
+            <div class="preview-footer">
+                <button class="action-btn cancel" onclick="closePreview()">돌아가기</button>
             </div>
+        </div>
+    </main>
 
-            <button id="deleteRecordBtn" onclick="resetRecords()">
-                <img id="deleteRecordImg" src="img/own_delete.png" alt="Delete">
-            </button>
+    <div class="floating-progress" onclick="generateImage()" style="cursor: pointer;" title="클릭하여 이미지 저장">
+        <div class="progress-info">
+            <span class="progress-label">수집률 (클릭 시 저장)</span>
+            <span class="progress-text" id="progressText">0/0 (0%)</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
 
-            <button id="scrollTopBtn" onclick="scrollToTop()">
-                <img id="scrollTopImg" src="img/top_own.png" alt="TOP">
-            </button>
-
-        </main>
-
+    <div class="floating-btns">
+        <button class="float-btn" onclick="scrollToTop()" title="맨 위로">
+            <img src="img/top_own.png" alt="Top" onerror="this.src='https://cdn-icons-png.flaticon.com/512/130/130906.png'">
+        </button>
     </div>
 
     <script src="script.js"></script>
