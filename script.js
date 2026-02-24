@@ -5,12 +5,7 @@ const STORAGE_KEY = 'nongdam_kenshistyle_owned';
 
 let ownedItems = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
 
-// 농담곰 전용 다중 필터 상태
-let activeFilters = {
-    country: 'all',
-    character: 'all',
-    group: 'all'
-};
+let activeFilters = { country: 'all', character: 'all', group: 'all' };
 
 const listContainer = document.getElementById('listContainer');
 const navMenuContainer = document.getElementById('navMenuContainer');
@@ -27,7 +22,7 @@ async function init() {
     setupEventListeners();
     await fetchData();
     if(productData.length > 0) {
-        renderNavMenu(); // 요네즈 켄시처럼 필터를 nav-group으로 생성
+        renderNavMenu(); // 줄바꿈 구조의 필터 렌더링
         renderAllList(); 
         updateProgress();
     }
@@ -39,7 +34,6 @@ function setupEventListeners() {
         updateCollectionPreview();
     });
     optTitleCheck.addEventListener('change', updateCollectionPreview);
-    
     optNameKoCheck.addEventListener('change', () => {
         if(optNameKoCheck.checked) optNameJpCheck.checked = false;
         updateCollectionPreview();
@@ -97,8 +91,9 @@ function parseCSV(csvText) {
 function goHome() {
     activeFilters = { country: 'all', character: 'all', group: 'all' };
     
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.nav-item[data-val="all"]').forEach(b => b.classList.add('active'));
+    // 버튼 초기화 (ALL 활성화)
+    document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('[onclick*="\'all\'"]').forEach(b => b.classList.add('active'));
 
     closeSidebar();
     closePreview();
@@ -112,98 +107,58 @@ function closePreview() {
     document.getElementById('imgCollection').src = "";
 }
 
-// 요네즈 켄시 메뉴 구조(nav-group)로 농담곰 필터 생성
 function renderNavMenu() {
-    navMenuContainer.innerHTML = '';
-    sidebarContent.innerHTML = '';
+    // 줄바꿈 형태의 농담곰 필터 + 요네즈 켄시 버튼(저장/초기화) HTML 생성
+    const filterHtml = `
+        <div class="filter-row">
+            <span class="filter-label">국가</span>
+            <button class="text-btn active" onclick="setFilter('country', 'all', this)">ALL</button>
+            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china', this)"><div class="overlay">중국</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_tw.png');" onclick="setFilter('country', 'taiwan', this)"><div class="overlay">대만</div></div>
+        </div>
 
-    // 1. HOME 기능 메뉴
-    const createHomeGroup = () => {
-        const homeGroup = document.createElement('div');
-        homeGroup.className = 'nav-group';
-        
-        const homeBtn = document.createElement('button');
-        homeBtn.className = 'nav-header'; 
-        homeBtn.innerText = 'HOME';
-        homeBtn.onclick = goHome;
-        homeGroup.appendChild(homeBtn);
+        <div class="filter-row">
+            <span class="filter-label">캐릭터</span>
+            <button class="text-btn active" onclick="setFilter('character', 'all', this)">ALL</button>
+            <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma', this)"><div class="overlay">농담곰</div></div>
+            <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro', this)"><div class="overlay">두더지<br>고로케</div></div>
+            <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug', this)"><div class="overlay">퍼그 상</div></div>
+            <div class="char-btn" style="background-image: url('img/icon_characters/icon_ngn.png');" onclick="setFilter('character', 'ngn', this)"><div class="overlay">기타</div></div>
+        </div>
 
-        const saveBtn = document.createElement('button');
-        saveBtn.className = 'nav-item nav-action'; 
-        saveBtn.innerText = '이미지 저장';
-        saveBtn.onclick = () => {
-            generateImage();
-            closeSidebar(); 
-        };
-        homeGroup.appendChild(saveBtn);
+        <div class="filter-row">
+            <span class="filter-label">종류</span>
+            <button class="text-btn active" onclick="setFilter('group', 'all', this)">ALL</button>
+            <button class="text-btn" onclick="setFilter('group', '마스코트', this)">마스코트</button>
+            <button class="text-btn" onclick="setFilter('group', '쿠션', this)">쿠션</button>
+            <button class="text-btn" onclick="setFilter('group', '인형', this)">인형</button>
+            <button class="text-btn" onclick="setFilter('group', '잡화', this)">잡화</button>
+        </div>
 
-        const resetBtn = document.createElement('button');
-        resetBtn.className = 'nav-item nav-action';
-        resetBtn.innerText = '기록 초기화';
-        resetBtn.onclick = () => {
-            resetRecords();
-            closeSidebar();
-        };
-        homeGroup.appendChild(resetBtn);
-        return homeGroup;
-    };
+        <div class="filter-action-row">
+            <button class="filter-action-btn" onclick="generateImage(); closeSidebar();">이미지 저장</button>
+            <button class="filter-action-btn reset" onclick="resetRecords(); closeSidebar();">기록 초기화</button>
+        </div>
+    `;
 
-    navMenuContainer.appendChild(createHomeGroup());
-    sidebarContent.appendChild(createHomeGroup());
-
-    // 2. 농담곰 필터 메뉴들
-    const filtersConfig = [
-        { title: '국가', key: 'country', items: [{label: 'ALL', val: 'all'}, {label: '한국', val: 'korea'}, {label: '일본', val: 'japan'}, {label: '중국', val: 'china'}, {label: '대만', val: 'taiwan'}] },
-        { title: '캐릭터', key: 'character', items: [{label: 'ALL', val: 'all'}, {label: '농담곰', val: 'kuma'}, {label: '두더지고로케', val: 'mogukoro'}, {label: '퍼그 상', val: 'pug'}, {label: '기타', val: 'ngn'}] },
-        { title: '종류', key: 'group', items: [{label: 'ALL', val: 'all'}, {label: '마스코트', val: '마스코트'}, {label: '쿠션', val: '쿠션'}, {label: '인형', val: '인형'}, {label: '잡화', val: '잡화'}] }
-    ];
-
-    filtersConfig.forEach(config => {
-        const pcGroup = createFilterGroup(config, false);
-        navMenuContainer.appendChild(pcGroup);
-        const mobileGroup = createFilterGroup(config, true);
-        sidebarContent.appendChild(mobileGroup);
-    });
+    navMenuContainer.innerHTML = filterHtml;
+    sidebarContent.innerHTML = filterHtml;
 }
 
-function createFilterGroup(config, isMobile) {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'nav-group';
+window.setFilter = function(type, value, btnElem) {
+    activeFilters[type] = value;
+    
+    // 클릭된 타입과 같은 모든 버튼의 active 해제 (PC, 모바일 동기화)
+    document.querySelectorAll(`[onclick*="'${type}'"]`).forEach(el => el.classList.remove('active'));
+    
+    // 선택된 값과 동일한 모든 버튼에 active 추가
+    document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.add('active'));
 
-    const header = document.createElement('div');
-    header.className = 'nav-header';
-    header.innerText = config.title;
-    groupDiv.appendChild(header);
-
-    config.items.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'nav-item';
-        btn.innerText = item.label;
-        btn.dataset.type = config.key;
-        btn.dataset.val = item.val;
-        
-        if(item.val === 'all') btn.classList.add('active'); // 기본값
-
-        btn.onclick = (e) => {
-            // 같은 그룹 내의 active 해제
-            const parent = e.target.closest('.nav-group');
-            parent.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-
-            // 양쪽(PC, 모바일) 동기화
-            document.querySelectorAll(`.nav-item[data-type="${config.key}"][data-val="${item.val}"]`)
-                    .forEach(b => b.classList.add('active'));
-
-            activeFilters[config.key] = item.val;
-            applyMultiFilters();
-            window.scrollTo(0, 0); 
-            if(isMobile) closeSidebar();
-            closePreview();
-        };
-        groupDiv.appendChild(btn);
-    });
-    return groupDiv;
-}
+    applyMultiFilters();
+    window.scrollTo(0, 0); 
+};
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -241,7 +196,6 @@ function renderList(items) {
 
     const grouped = new Map();
     items.forEach(item => {
-        // 기존 농담곰 그룹핑 로직: 캐릭터가 ngn일 때 subGroup이 있으면 그걸로 분류
         let key = item.group;
         if (activeFilters.character === 'ngn' && item.subGroup) {
             key = item.subGroup;
@@ -309,7 +263,7 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function resetRecords() {
+window.resetRecords = function() {
     if (confirm("모든 체크 기록을 삭제하시겠습니까?")) {
         ownedItems.clear();
         localStorage.removeItem(STORAGE_KEY);
@@ -332,8 +286,7 @@ function updateProgress() {
     if(progressText) progressText.innerText = `${validOwnedCount}/${totalCount} (${percent}%)`;
 }
 
-// 요네즈 켄시의 캔버스 로직 100% 동일
-async function generateImage() {
+window.generateImage = async function() {
     await document.fonts.ready;
     
     const checkedItems = productData.filter(item => ownedItems.has(item.id));

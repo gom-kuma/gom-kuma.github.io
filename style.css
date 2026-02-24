@@ -13,7 +13,7 @@
 }
 
 :root {
-    --primary-color: #182558; 
+    --primary-color: #182558; /* 요네즈 켄시 남색 테마 */
     --bg-color: #fafafa;
     --card-bg: #ffffff;
     --text-color: #333;
@@ -23,9 +23,7 @@ body {
     font-family: 'Pretendard', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    padding-bottom: 120px; 
+    margin: 0; padding: 0; padding-bottom: 120px; 
     -webkit-font-smoothing: antialiased;
 }
 
@@ -38,194 +36,98 @@ header {
     z-index: 1010; 
 }
 
-.header-top-row {
-    position: relative;
-    margin-bottom: 40px; 
+.header-top-row { position: relative; margin-bottom: 30px; }
+
+/* 폰트 Paperlogy 일괄 적용 (강조 부분) */
+h1, .preview-label, .category-title, .action-btn, .filter-label, .filter-action-btn {
+    font-family: 'Paperlogy', sans-serif;
 }
 
 h1 {
-    font-family: 'Paperlogy', sans-serif;
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--primary-color);
-    letter-spacing: -0.5px;
-    cursor: pointer; 
+    margin: 0; font-size: 1.8rem; font-weight: 900;
+    color: var(--primary-color); letter-spacing: -0.5px; cursor: pointer; 
 }
 
-#navMenuContainer {
-    display: flex;
-    flex-wrap: wrap;       
-    justify-content: center; 
-    gap: 50px;              
-    max-width: 1200px;
-    margin: 0 auto;
-    text-align: left;
-    align-items: flex-start; 
+/* === 농담곰 커스텀 필터 디자인 (요네즈 켄시 레이아웃에 맞게 수정) === */
+#navMenuContainer, #sidebarContent {
+    display: flex; flex-direction: column; /* 줄바꿈 형태 */
+    align-items: center; gap: 15px; 
+    max-width: 1200px; margin: 0 auto;
 }
 
-.nav-group {
-    display: flex;
-    flex-direction: column; 
-    min-width: 100px;       
+.filter-row {
+    display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%;
 }
 
-.nav-header {
-    font-family: 'Paperlogy', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 900;       
-    color: #000;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    border-bottom: none; 
-    padding-bottom: 5px;
-    background: none;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    padding: 0;
+.filter-label { font-size: 1.1rem; color: var(--primary-color); margin-right: 5px; }
+
+/* 국기 버튼 */
+.flag-btn {
+    width: 36px; height: 24px; border-radius: 4px; border: 2px solid #dfe6e9;
+    background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
 }
-.nav-header:hover { color: var(--primary-color); }
-
-.nav-item {
-    background: none;
-    border: none;
-    text-align: left;
-    padding: 4px 0;
-    cursor: pointer;
-    font-size: 0.95rem;
-    color: #555;
-    font-family: 'Pretendard', sans-serif;
-    transition: all 0.2s;
-    line-height: 1.5;
+.flag-btn .overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; opacity: 0; transition: 0.2s;
 }
-.nav-item:hover { color: var(--primary-color); font-weight: bold; }
-.nav-item.active { color: var(--primary-color); font-weight: bold; }
+.flag-btn:hover .overlay { opacity: 1; }
+.flag-btn.active { border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-color); }
 
-.nav-action { color: #888; font-size: 0.9rem; margin-top: 5px; }
-.nav-action:hover { color: #d9534f; font-weight: bold; }
+/* 캐릭터 버튼 */
+.char-btn {
+    width: 48px; height: 48px; border-radius: 12px; border: 2px solid #dfe6e9;
+    background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
+}
+.char-btn .overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; opacity: 0; transition: 0.2s; text-align: center;
+}
+.char-btn:hover .overlay { opacity: 1; }
+.char-btn.active { border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-color); }
 
+/* 일반 텍스트 버튼 */
+.text-btn { 
+    padding: 8px 14px; border: 2px solid #dfe6e9; border-radius: 8px; 
+    background: white; cursor: pointer; font-size: 14px; color: #636e72; 
+    font-family: 'Pretendard', sans-serif; transition: 0.2s; font-weight: bold;
+}
+.text-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+.text-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+/* 이미지 저장 & 초기화 버튼 나란히 배치 */
+.filter-action-row { display: flex; justify-content: center; gap: 15px; margin-top: 10px; width: 100%; }
+.filter-action-btn {
+    padding: 10px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer; 
+    border: none; transition: all 0.2s; background-color: var(--primary-color); color: white; flex: 1; max-width: 150px;
+}
+.filter-action-btn:hover { background-color: #2a3b75; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.filter-action-btn.reset { background-color: #eee; color: #555; }
+.filter-action-btn.reset:hover { background-color: #ddd; }
+
+/* === 요네즈 켄시 기본 사이드바 & 햄버거 === */
 .hamburger-menu {
-    display: none; 
-    position: fixed; 
-    top: 16px; 
-    right: 20px;
-    width: 22px;  
-    height: 18px; 
-    cursor: pointer;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 2000; 
+    display: none; position: fixed; top: 16px; right: 20px; width: 22px; height: 18px; 
+    cursor: pointer; flex-direction: column; justify-content: space-between; z-index: 2000; 
 }
-.hamburger-menu span {
-    display: block; height: 2px; width: 100%;
-    background-color: var(--primary-color); border-radius: 2px;
-}
+.hamburger-menu span { display: block; height: 2px; width: 100%; background-color: var(--primary-color); border-radius: 2px; }
 .hamburger-menu.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
 .hamburger-menu.open span:nth-child(2) { opacity: 0; }
 .hamburger-menu.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 .sidebar {
-    position: fixed; top: 0; right: 0; width: 260px; height: 100%;
+    position: fixed; top: 0; right: 0; width: 320px; height: 100%;
     background-color: white; box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     z-index: 1500; transform: translateX(100%); transition: transform 0.3s ease-in-out;
-    padding: 70px 25px 30px 25px; overflow-y: auto;
-    -webkit-overflow-scrolling: touch; 
+    padding: 60px 20px 30px 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; 
 }
 .sidebar.open { transform: translateX(0); }
-.sidebar-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5); z-index: 1400; display: none;
-}
+.sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1400; display: none; }
 .sidebar-overlay.open { display: block; }
 
-#sidebarContent .nav-group { margin-bottom: 25px; width: 100%; }
-#sidebarContent .nav-header { border-bottom: 2px solid #eee; padding-bottom: 5px; font-size: 1.1rem; margin-bottom: 8px; color: var(--primary-color); }
-#sidebarContent .nav-item { border-bottom: none; padding: 2px 0; font-size: 0.95rem; color: #444; }
-
-#listContainer { max-width: 1200px; margin: 0 auto; padding: 20px; margin-top: 50px; }
-
-#previewContainer {
-    max-width: 1000px; margin: 0 auto; padding: 20px; margin-top: 30px;
-    display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;
-}
-
-.preview-card {
-    flex: 1; min-width: 300px; background: #fff; padding: 20px;
-    border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    text-align: center; display: flex; flex-direction: column;
-}
-
-.preview-header-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px; 
-    margin-bottom: 20px;
-    border-bottom: 2px solid #f0f2f5;
-    padding-bottom: 15px;
-}
-
-.preview-label {
-    font-family: 'Paperlogy', sans-serif; font-size: 1.2rem;
-    color: var(--primary-color); font-weight: bold; margin: 0;
-}
-
-.preview-img-box {
-    background-color: transparent; 
-    padding: 10px; border-radius: 8px; margin-bottom: 15px;
-    display: flex; align-items: center; justify-content: center;
-}
-.preview-img-box img { max-width: 100%; height: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block; }
-
-.preview-controls-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 15px;
-    width: 100%;
-    align-items: center;
-}
-
-.control-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-}
-
-.bottom-row {
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    overflow-x: auto; 
-}
-
-.control-label-text { font-size: 0.9rem; font-weight: bold; color: #333; margin-right: 5px; }
-.control-item { font-size: 0.9rem; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
-
-.preview-controls-wrapper input[type="text"] {
-    border: 1px solid #ccc; border-radius: 4px; padding: 6px 10px; font-size: 0.9rem;
-    font-family: 'Pretendard', sans-serif; width: 160px; text-align: left; outline: none;
-    background: #fff; transition: border-color 0.2s;
-}
-.preview-controls-wrapper input[type="text"]:focus { border-color: var(--primary-color); }
-
-.preview-footer { width: 100%; text-align: center; margin-top: 20px; }
-
-.action-btn {
-    padding: 10px 20px; border-radius: 8px; font-size: 0.95rem;
-    font-weight: bold; cursor: pointer; border: none; transition: all 0.2s;
-    font-family: 'Paperlogy', sans-serif; width: 100%;
-}
-.action-btn.cancel { background-color: #eee; color: #555; width: auto; padding: 10px 40px; }
-.action-btn.cancel:hover { background-color: #ddd; }
-.action-btn.download { background-color: var(--primary-color); color: white; }
-.action-btn.download:hover { background-color: #2a3b75; }
-.action-btn.small-btn { width: auto; padding: 6px 15px; font-size: 0.85rem; border-radius: 6px; }
-
+/* === 요네즈 켄시 아이템 리스트 === */
+#listContainer { max-width: 1200px; margin: 0 auto; padding: 20px; margin-top: 20px; }
 .category-section { margin-bottom: 40px; }
-.category-title { font-family: 'Paperlogy', sans-serif; font-size: 1.2rem; margin-bottom: 15px; border-left: 5px solid var(--primary-color); padding-left: 10px; color: #444; }
+.category-title { font-size: 1.2rem; margin-bottom: 15px; border-left: 5px solid var(--primary-color); padding-left: 10px; color: #444; }
 .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
 
 .item-card { background: var(--card-bg); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; position: relative; }
@@ -243,16 +145,38 @@ h1 {
     background-size: contain; background-repeat: no-repeat; background-position: center;
 }
 
-.item-info { padding: 10px; }
+.item-info { padding: 10px; text-align: left; }
 .item-name { font-size: 0.95rem; font-weight: bold; margin-bottom: 4px; word-break: keep-all; }
 .item-subname { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
 .item-price { font-size: 0.85rem; color: var(--primary-color); font-weight: bold; }
 
+/* === 요네즈 켄시 미리보기 모달 === */
+#previewContainer { max-width: 1000px; margin: 0 auto; padding: 20px; margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+.preview-card { flex: 1; min-width: 300px; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; }
+.preview-header-row { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+.preview-label { font-size: 1.2rem; color: var(--primary-color); font-weight: bold; margin: 0; }
+.preview-img-box { background-color: transparent; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+.preview-img-box img { max-width: 100%; height: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: block; }
+.preview-controls-wrapper { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; width: 100%; align-items: center; }
+.control-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.bottom-row { flex-wrap: nowrap; white-space: nowrap; overflow-x: auto; }
+.control-label-text { font-size: 0.9rem; font-weight: bold; color: #333; margin-right: 5px; }
+.control-item { font-size: 0.9rem; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.preview-controls-wrapper input[type="text"] { border: 1px solid #ccc; border-radius: 4px; padding: 6px 10px; font-size: 0.9rem; font-family: 'Pretendard', sans-serif; width: 160px; text-align: left; outline: none; background: #fff; transition: border-color 0.2s; }
+.preview-controls-wrapper input[type="text"]:focus { border-color: var(--primary-color); }
+.preview-footer { width: 100%; text-align: center; margin-top: 20px; }
+.action-btn { padding: 10px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer; border: none; transition: all 0.2s; width: 100%; }
+.action-btn.cancel { background-color: #eee; color: #555; width: auto; padding: 10px 40px; }
+.action-btn.cancel:hover { background-color: #ddd; }
+.action-btn.download { background-color: var(--primary-color); color: white; }
+.action-btn.download:hover { background-color: #2a3b75; }
+.action-btn.small-btn { width: auto; padding: 6px 15px; font-size: 0.85rem; border-radius: 6px; }
+
+/* === 요네즈 켄시 플로팅 === */
 .floating-btns { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; }
 .float-btn { width: 60px; height: 60px; border-radius: 50%; background-color: #FFFFFF; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; padding: 0; }
 .float-btn img { width: 30px; height: 30px; object-fit: contain; }
 .float-btn:hover { transform: scale(1.1); }
-
 .floating-progress { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 250px; background-color: #FFFFFF; border-radius: 15px; padding: 15px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 900; }
 .progress-info { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; color: #666; font-weight: bold; }
 .progress-text { color: var(--primary-color); }
@@ -265,7 +189,6 @@ h1 {
     .header-top-row { margin-bottom: 0; }
     #listContainer { margin-top: 20px; }
     #previewContainer { flex-direction: column; }
-    
     h1 { margin: 0; font-size: 1.3rem; line-height: 1; display: inline-block; vertical-align: middle; }
     #navMenuContainer { display: none; }
     .hamburger-menu { display: flex; }
@@ -274,16 +197,9 @@ h1 {
     .float-btn { width: 40px; height: 40px; }
     .float-btn img { width: 22px; height: 22px; }
     .floating-progress { width: 60%; padding: 10px 15px; bottom: 20px; }
-    
     .control-row { justify-content: center; }
     .preview-controls-wrapper input[type="text"] { width: 140px; }
-    
-    .bottom-row {
-        justify-content: flex-start;
-        overflow-x: auto;
-        width: 100%;
-        padding-bottom: 5px;
-        scrollbar-width: none; -ms-overflow-style: none;
-    }
+    .bottom-row { justify-content: flex-start; overflow-x: auto; width: 100%; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
     .bottom-row::-webkit-scrollbar { display: none; }
+    .filter-row { flex-wrap: wrap; }
 }
