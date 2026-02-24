@@ -1,33 +1,34 @@
-// --- 설정 및 데이터 ---
 const SHEET_ID = '1hTPuwTZkRnPVoo5GUUC1fhuxbscwJrLdWVG-eHPWaIM';
 let productData = [];
 let currentDisplayData = []; 
-const STORAGE_KEY = 'nongdam_owned';
+const STORAGE_KEY = 'nongdam_kenshistyle_owned';
 
 let ownedItems = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
 
-// 농담곰 필터 상태
-let filters = { country: 'all', character: 'all', group: 'all' }; 
+// 농담곰 전용 다중 필터 상태
+let activeFilters = {
+    country: 'all',
+    character: 'all',
+    group: 'all'
+};
 
 const listContainer = document.getElementById('listContainer');
-const previewContainer = document.getElementById('previewContainer');
 const navMenuContainer = document.getElementById('navMenuContainer');
 const sidebarContent = document.getElementById('sidebarContent');
+const previewContainer = document.getElementById('previewContainer');
 
-// 옵션 엘리먼트
 const optTitleCheck = document.getElementById('optTitleCheck');
 const optTitleInput = document.getElementById('optTitleInput');
 const optNameKoCheck = document.getElementById('optNameKoCheck');
+const optNameJpCheck = document.getElementById('optNameJpCheck');
 const optPriceCheck = document.getElementById('optPriceCheck');
-const simpleModeCheck = document.getElementById('simpleModeCheck');
 
-// --- 초기화 ---
 async function init() {
     setupEventListeners();
-    renderFilterUI(); // 필터 UI 생성
     await fetchData();
     if(productData.length > 0) {
-        applyFiltersAndRender(); 
+        renderNavMenu(); // 요네즈 켄시처럼 필터를 nav-group으로 생성
+        renderAllList(); 
         updateProgress();
     }
 }
@@ -38,74 +39,25 @@ function setupEventListeners() {
         updateCollectionPreview();
     });
     optTitleCheck.addEventListener('change', updateCollectionPreview);
-    optNameKoCheck.addEventListener('change', updateCollectionPreview);
+    
+    optNameKoCheck.addEventListener('change', () => {
+        if(optNameKoCheck.checked) optNameJpCheck.checked = false;
+        updateCollectionPreview();
+    });
+    optNameJpCheck.addEventListener('change', () => {
+        if(optNameJpCheck.checked) optNameKoCheck.checked = false;
+        updateCollectionPreview();
+    });
     optPriceCheck.addEventListener('change', updateCollectionPreview);
 }
 
-// --- 농담곰 필터 UI 생성 ---
-function renderFilterUI() {
-    const htmlString = `
-        <div class="filter-group">
-            <button class="text-btn active" onclick="setFilter('country', 'all', this)">ALL</button>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china', this)"><div class="overlay">중국</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_tw.png');" onclick="setFilter('country', 'taiwan', this)"><div class="overlay">대만</div></div>
-            
-            <div class="filter-divider"></div>
-
-            <button class="text-btn active" onclick="setFilter('character', 'all', this)">ALL</button>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma', this)"><div class="overlay">농담곰</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro', this)"><div class="overlay">두더지<br>고로케</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug', this)"><div class="overlay">퍼그 상</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_ngn.png');" onclick="setFilter('character', 'ngn', this)"><div class="overlay">기타</div></div>
-            
-            <div class="filter-divider"></div>
-
-            <button class="text-btn active" onclick="setFilter('group', 'all', this)">ALL</button>
-            <button class="text-btn" onclick="setFilter('group', '마스코트', this)">마스코트</button>
-            <button class="text-btn" onclick="setFilter('group', '쿠션', this)">쿠션</button>
-            <button class="text-btn" onclick="setFilter('group', '인형', this)">인형</button>
-            <button class="text-btn" onclick="setFilter('group', '잡화', this)">잡화</button>
-
-            <div class="filter-divider"></div>
-            <button class="text-btn" onclick="resetRecords()" style="border-color:#ff7675; color:#d63031;">초기화</button>
-        </div>
-    `;
-    navMenuContainer.innerHTML = htmlString;
-    sidebarContent.innerHTML = `<h2 class="sidebar-title">필터</h2>` + htmlString;
+async function updateCollectionPreview() {
+    const checkedItems = productData.filter(item => ownedItems.has(item.id));
+    if (checkedItems.length === 0) return;
+    const collectionUrl = await drawCollectionCanvas(checkedItems);
+    document.getElementById('imgCollection').src = collectionUrl;
 }
 
-// 필터 적용 함수
-window.setFilter = function(type, value, btnElem) {
-    filters[type] = value;
-    
-    // 버튼 Active 상태 변경
-    const parentGroup = btnElem.closest('.filter-group');
-    // type이 일치하는 버튼들만 active 제거하기 로직 (간단히 siblings 중 특정 클래스만 처리)
-    // 좀 더 정확히 하려면 type별 컨테이너를 나누는게 좋지만 기존 UI 유지를 위해 분기처리
-    let targets = [];
-    if(type === 'country') targets = parentGroup.querySelectorAll('.flag-btn, button[onclick*="country"]');
-    if(type === 'character') targets = parentGroup.querySelectorAll('.char-btn, button[onclick*="character"]');
-    if(type === 'group') targets = parentGroup.querySelectorAll('button[onclick*="group"]');
-    
-    targets.forEach(b => b.classList.remove('active'));
-    btnElem.classList.add('active');
-
-    applyFiltersAndRender();
-};
-
-function applyFiltersAndRender() {
-    currentDisplayData = productData.filter(item => {
-        if (filters.country !== 'all' && item.country !== filters.country) return false;
-        if (filters.character !== 'all' && item.character !== filters.character) return false;
-        if (filters.group !== 'all' && item.group !== filters.group) return false;
-        return true;
-    });
-    renderList(currentDisplayData);
-}
-
-// --- 데이터 가져오기 ---
 async function fetchData() {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     try {
@@ -122,8 +74,7 @@ async function fetchData() {
 function parseCSV(csvText) {
     const rows = csvText.split('\n').map(row => {
         const regex = /(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)/g;
-        let columns = [];
-        let match;
+        let columns = []; let match;
         while (match = regex.exec(row)) {
             let col = match[1].replace(/^"|"$/g, '').replace(/""/g, '"');
             columns.push(col.trim());
@@ -143,26 +94,118 @@ function parseCSV(csvText) {
     return data;
 }
 
-// --- 화면 전환 및 네비게이션 ---
-window.goHome = function() {
-    filters = { country: 'all', character: 'all', group: 'all' };
-    document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('button[onclick*="all"]').forEach(el => el.classList.add('active'));
+function goHome() {
+    activeFilters = { country: 'all', character: 'all', group: 'all' };
     
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-item[data-val="all"]').forEach(b => b.classList.add('active'));
+
     closeSidebar();
     closePreview();
-    applyFiltersAndRender();
+    renderAllList();
     scrollToTop();
 }
 
-window.closePreview = function() {
+function closePreview() {
     listContainer.style.display = 'block';
     previewContainer.style.display = 'none';
     document.getElementById('imgCollection').src = "";
-    document.querySelector('.floating-progress').style.display = 'flex';
 }
 
-window.toggleSidebar = function() {
+// 요네즈 켄시 메뉴 구조(nav-group)로 농담곰 필터 생성
+function renderNavMenu() {
+    navMenuContainer.innerHTML = '';
+    sidebarContent.innerHTML = '';
+
+    // 1. HOME 기능 메뉴
+    const createHomeGroup = () => {
+        const homeGroup = document.createElement('div');
+        homeGroup.className = 'nav-group';
+        
+        const homeBtn = document.createElement('button');
+        homeBtn.className = 'nav-header'; 
+        homeBtn.innerText = 'HOME';
+        homeBtn.onclick = goHome;
+        homeGroup.appendChild(homeBtn);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'nav-item nav-action'; 
+        saveBtn.innerText = '이미지 저장';
+        saveBtn.onclick = () => {
+            generateImage();
+            closeSidebar(); 
+        };
+        homeGroup.appendChild(saveBtn);
+
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'nav-item nav-action';
+        resetBtn.innerText = '기록 초기화';
+        resetBtn.onclick = () => {
+            resetRecords();
+            closeSidebar();
+        };
+        homeGroup.appendChild(resetBtn);
+        return homeGroup;
+    };
+
+    navMenuContainer.appendChild(createHomeGroup());
+    sidebarContent.appendChild(createHomeGroup());
+
+    // 2. 농담곰 필터 메뉴들
+    const filtersConfig = [
+        { title: '국가', key: 'country', items: [{label: 'ALL', val: 'all'}, {label: '한국', val: 'korea'}, {label: '일본', val: 'japan'}, {label: '중국', val: 'china'}, {label: '대만', val: 'taiwan'}] },
+        { title: '캐릭터', key: 'character', items: [{label: 'ALL', val: 'all'}, {label: '농담곰', val: 'kuma'}, {label: '두더지고로케', val: 'mogukoro'}, {label: '퍼그 상', val: 'pug'}, {label: '기타', val: 'ngn'}] },
+        { title: '종류', key: 'group', items: [{label: 'ALL', val: 'all'}, {label: '마스코트', val: '마스코트'}, {label: '쿠션', val: '쿠션'}, {label: '인형', val: '인형'}, {label: '잡화', val: '잡화'}] }
+    ];
+
+    filtersConfig.forEach(config => {
+        const pcGroup = createFilterGroup(config, false);
+        navMenuContainer.appendChild(pcGroup);
+        const mobileGroup = createFilterGroup(config, true);
+        sidebarContent.appendChild(mobileGroup);
+    });
+}
+
+function createFilterGroup(config, isMobile) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'nav-group';
+
+    const header = document.createElement('div');
+    header.className = 'nav-header';
+    header.innerText = config.title;
+    groupDiv.appendChild(header);
+
+    config.items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-item';
+        btn.innerText = item.label;
+        btn.dataset.type = config.key;
+        btn.dataset.val = item.val;
+        
+        if(item.val === 'all') btn.classList.add('active'); // 기본값
+
+        btn.onclick = (e) => {
+            // 같은 그룹 내의 active 해제
+            const parent = e.target.closest('.nav-group');
+            parent.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+
+            // 양쪽(PC, 모바일) 동기화
+            document.querySelectorAll(`.nav-item[data-type="${config.key}"][data-val="${item.val}"]`)
+                    .forEach(b => b.classList.add('active'));
+
+            activeFilters[config.key] = item.val;
+            applyMultiFilters();
+            window.scrollTo(0, 0); 
+            if(isMobile) closeSidebar();
+            closePreview();
+        };
+        groupDiv.appendChild(btn);
+    });
+    return groupDiv;
+}
+
+function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const hamburger = document.querySelector('.hamburger-menu');
@@ -172,26 +215,35 @@ window.toggleSidebar = function() {
     document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
 }
 
-window.closeSidebar = function() {
+function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('open');
     document.querySelector('.hamburger-menu').classList.remove('open');
     document.body.style.overflow = ''; 
 }
 
-// --- 리스트 렌더링 ---
+function applyMultiFilters() {
+    currentDisplayData = productData.filter(item => {
+        if (activeFilters.country !== 'all' && item.country !== activeFilters.country) return false;
+        if (activeFilters.character !== 'all' && item.character !== activeFilters.character) return false;
+        if (activeFilters.group !== 'all' && item.group !== activeFilters.group) return false;
+        return true;
+    });
+    renderList(currentDisplayData);
+}
+
 function renderList(items) {
     listContainer.innerHTML = '';
     if (items.length === 0) {
-        listContainer.innerHTML = '<div class="status-msg">해당하는 농담곰이 없습니다 😢</div>';
+        listContainer.innerHTML = '<div class="status-msg">해당하는 상품이 없습니다.</div>';
         return;
     }
 
     const grouped = new Map();
     items.forEach(item => {
-        // 기존 농담곰 로직: ngn 캐릭터이고 subGroup이 있으면 그걸로 그룹핑
+        // 기존 농담곰 그룹핑 로직: 캐릭터가 ngn일 때 subGroup이 있으면 그걸로 분류
         let key = item.group;
-        if (filters.character === 'ngn' && item.subGroup) {
+        if (activeFilters.character === 'ngn' && item.subGroup) {
             key = item.subGroup;
         }
         if (!grouped.has(key)) grouped.set(key, []);
@@ -205,7 +257,7 @@ function renderList(items) {
         
         const titleDiv = document.createElement('div');
         titleDiv.className = 'category-title';
-        titleDiv.innerHTML = `${title} <small style="color:#a4b0be; font-weight:normal;">(${ownedCount}/${groupItems.length})</small>`;
+        titleDiv.innerHTML = `${title} <small style="color:#888; font-weight:normal;">(${ownedCount}/${groupItems.length})</small>`;
         
         const grid = document.createElement('div');
         grid.className = 'items-grid';
@@ -225,6 +277,7 @@ function renderList(items) {
                 </div>
                 <div class="item-info">
                     <div class="item-name">${item.nameKo}</div>
+                    <div class="item-subname">${item.nameJp || ''}</div>
                     <div class="item-price">${item.price || '-'}</div>
                 </div>
             `;
@@ -234,6 +287,11 @@ function renderList(items) {
         section.appendChild(grid);
         listContainer.appendChild(section);
     }
+}
+
+function renderAllList() {
+    currentDisplayData = productData;
+    renderList(productData);
 }
 
 function toggleCheck(id) {
@@ -247,33 +305,35 @@ function toggleCheck(id) {
     updateProgress(); 
 }
 
-window.scrollToTop = function() {
+function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-window.resetRecords = function() {
+function resetRecords() {
     if (confirm("모든 체크 기록을 삭제하시겠습니까?")) {
         ownedItems.clear();
         localStorage.removeItem(STORAGE_KEY);
         renderList(currentDisplayData);
         updateProgress();
         alert("초기화되었습니다.");
-        closeSidebar();
     }
 }
 
 function updateProgress() {
     const totalCount = productData.length;
     if (totalCount === 0) return;
+    
     const validOwnedCount = productData.filter(item => ownedItems.has(item.id)).length;
     const percent = Math.round((validOwnedCount / totalCount) * 100);
     
-    document.getElementById('progressBar').style.width = `${percent}%`;
-    document.getElementById('progressText').innerText = `${validOwnedCount}/${totalCount} (${percent}%)`;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    if(progressBar) progressBar.style.width = `${percent}%`;
+    if(progressText) progressText.innerText = `${validOwnedCount}/${totalCount} (${percent}%)`;
 }
 
-// --- 이미지 생성 렌더링 (미리보기 모달) ---
-window.generateImage = async function() {
+// 요네즈 켄시의 캔버스 로직 100% 동일
+async function generateImage() {
     await document.fonts.ready;
     
     const checkedItems = productData.filter(item => ownedItems.has(item.id));
@@ -281,19 +341,11 @@ window.generateImage = async function() {
         alert("선택된 상품이 없습니다.");
         return;
     }
-
     updateCollectionPreview();
+    
     listContainer.style.display = 'none';
-    document.querySelector('.floating-progress').style.display = 'none'; // 바 숨기기
     previewContainer.style.display = 'flex';
     scrollToTop();
-}
-
-window.updateCollectionPreview = async function() {
-    const checkedItems = productData.filter(item => ownedItems.has(item.id));
-    if (checkedItems.length === 0) return;
-    const collectionUrl = await drawCollectionCanvas(checkedItems);
-    document.getElementById('imgCollection').src = collectionUrl;
 }
 
 async function drawCollectionCanvas(items) {
@@ -303,36 +355,29 @@ async function drawCollectionCanvas(items) {
     const showTitle = optTitleCheck.checked;
     const titleText = optTitleInput.value;
     const showNameKo = optNameKoCheck.checked;
+    const showNameJp = optNameJpCheck.checked;
     const showPrice = optPriceCheck.checked;
-    const isSimple = simpleModeCheck.checked; // 간소화 모드
+    const showText = showNameKo || showNameJp;
 
-    let cardWidth, imgHeight, cardHeight, gap, colCount;
-
-    if (isSimple) {
-        cardWidth = 160; imgHeight = 160; cardHeight = 160; gap = 15;
-        // 간소화 모드에선 강제로 텍스트 제거
-        optNameKoCheck.disabled = true; optPriceCheck.disabled = true;
-    } else {
-        cardWidth = 200; imgHeight = 200; gap = 20;
-        optNameKoCheck.disabled = false; optPriceCheck.disabled = false;
-        
-        let textHeight = 0;
-        if (showNameKo) textHeight += 40; 
-        if (showPrice) textHeight += 20;
-        if (showNameKo || showPrice) textHeight += 20;
-        cardHeight = imgHeight + textHeight;
-    }
-
-    // 그리드 열 개수 동적 조절 (가로로 너무 길어지지 않게)
-    colCount = Math.round(Math.sqrt(items.length));
-    if (colCount < 3) colCount = 3;
-    if (colCount > 8) colCount = 8;
-    if (items.length < 3) colCount = items.length;
-
-    const padding = 40; 
-    const titleAreaHeight = showTitle ? 100 : 0;
-    const rowCount = Math.ceil(items.length / colCount);
+    const cardWidth = 200;
+    const imgHeight = 200;
     
+    let textHeight = 0;
+    const nameLineHeight = 20;
+    const priceLineHeight = 20;
+    const paddingY = 10;
+
+    if (showText) textHeight += (nameLineHeight * 2); 
+    if (showPrice) textHeight += priceLineHeight;
+    if (showText || showPrice) textHeight += (paddingY * 2);
+
+    const cardHeight = imgHeight + textHeight;
+    const gap = 20; 
+    const colCount = 5;
+    const padding = 40; 
+    const titleAreaHeight = showTitle ? 80 : 0;
+
+    const rowCount = Math.ceil(items.length / colCount);
     const contentWidth = (cardWidth * colCount) + (gap * (colCount - 1));
     const contentHeight = (cardHeight * rowCount) + (gap * (rowCount - 1));
 
@@ -344,11 +389,11 @@ async function drawCollectionCanvas(items) {
 
     let startY = padding;
     if (showTitle) {
-        ctx.font = "bold 45px 'Paperlogy', sans-serif";
-        ctx.fillStyle = "#2d3436";
+        ctx.font = "bold 40px 'Paperlogy', sans-serif";
+        ctx.fillStyle = "#182558";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(titleText, cvs.width / 2, padding + 30);
+        ctx.fillText(titleText, cvs.width / 2, padding + 20);
         startY += titleAreaHeight;
     }
 
@@ -358,18 +403,15 @@ async function drawCollectionCanvas(items) {
     });
 
     const getLines = (text, maxWidth) => {
-        const words = text.split(' ');
+        const words = text.split('');
         const lines = []; let currentLine = words[0];
         for (let i = 1; i < words.length; i++) {
             const word = words[i];
-            if (ctx.measureText(currentLine + " " + word).width < maxWidth) {
-                currentLine += " " + word;
-            } else {
-                lines.push(currentLine); currentLine = word;
-            }
+            const width = ctx.measureText(currentLine + word).width;
+            if (width < maxWidth) { currentLine += word; } 
+            else { lines.push(currentLine); currentLine = word; }
         }
-        lines.push(currentLine);
-        return lines;
+        lines.push(currentLine); return lines;
     };
 
     for (let i = 0; i < items.length; i++) {
@@ -377,74 +419,60 @@ async function drawCollectionCanvas(items) {
         const c = i % colCount; const r = Math.floor(i / colCount);
         const x = padding + c * (cardWidth + gap);
         const y = startY + r * (cardHeight + gap);
+        const borderRadius = 15; 
+
+        ctx.save(); 
+        ctx.shadowColor = "rgba(0, 0, 0, 0.1)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4; ctx.fillStyle = "#ffffff"; 
+        ctx.beginPath(); ctx.roundRect(x, y, cardWidth, cardHeight, borderRadius); ctx.fill(); ctx.restore();
 
         const img = await loadImage(item.image);
+        if (img) {
+            ctx.save(); ctx.beginPath();
+            if (showText || showPrice) ctx.roundRect(x, y, cardWidth, imgHeight, [borderRadius, borderRadius, 0, 0]);
+            else ctx.roundRect(x, y, cardWidth, imgHeight, borderRadius);
+            ctx.clip();
+            const aspect = img.width / img.height; let dw = cardWidth, dh = imgHeight;
+            if (aspect > 1) dw = imgHeight * aspect; else dh = cardWidth / aspect;
+            ctx.drawImage(img, x + (cardWidth - dw)/2, y + (imgHeight - dh)/2, dw, dh);
+            ctx.restore(); 
+        }
 
-        if (isSimple) {
-            const radius = cardWidth / 2;
-            const cx = x + radius; const cy = y + radius;
-            
-            ctx.save();
-            ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.fillStyle = "white"; ctx.shadowColor = "rgba(0,0,0,0.1)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 2;
-            ctx.fill(); ctx.restore();
-
-            ctx.save();
-            ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.clip();
-            if (img) {
-                const aspect = img.width / img.height;
-                let dw = cardWidth, dh = cardHeight;
-                if (aspect > 1) dw = cardHeight * aspect; else dh = cardWidth / aspect;
-                ctx.drawImage(img, x + (cardWidth - dw) / 2, y + (cardHeight - dh) / 2, dw, dh);
-            }
-            ctx.restore();
-
-            ctx.save();
-            ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-            ctx.strokeStyle = "#2d3436"; ctx.lineWidth = 3; ctx.stroke();
-            ctx.restore();
-
-        } else {
-            const borderRadius = 15; 
-            ctx.save(); 
-            ctx.shadowColor = "rgba(0, 0, 0, 0.1)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4; ctx.fillStyle = "#ffffff"; 
-            ctx.beginPath(); ctx.roundRect(x, y, cardWidth, cardHeight, borderRadius); ctx.fill(); ctx.restore();
-            
-            ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, cardWidth, cardHeight, borderRadius);
-            ctx.strokeStyle = "#2d3436"; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
-
-            if (img) {
-                ctx.save(); ctx.beginPath();
-                if (showNameKo || showPrice) ctx.roundRect(x, y, cardWidth, imgHeight, [borderRadius, borderRadius, 0, 0]);
-                else ctx.roundRect(x, y, cardWidth, imgHeight, borderRadius);
-                ctx.clip();
-                const aspect = img.width / img.height; let dw = cardWidth, dh = imgHeight;
-                if (aspect > 1) dw = imgHeight * aspect; else dh = cardWidth / aspect;
-                ctx.drawImage(img, x + (cardWidth - dw)/2, y + (imgHeight - dh)/2, dw, dh);
-                ctx.restore(); 
+        if (showText || showPrice) {
+            ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#333";
+            let lines = [];
+            if (showText) {
+                ctx.font = "bold 15px 'Pretendard', sans-serif";
+                let textToDraw = showNameJp ? (item.nameJp && item.nameJp.trim() !== '' ? item.nameJp : item.nameKo) : item.nameKo;
+                let tempLines = getLines(textToDraw, cardWidth - 20);
+                if (tempLines.length > 2) { tempLines = tempLines.slice(0, 2); tempLines[1] = tempLines[1].slice(0, -1) + "..."; }
+                lines = tempLines;
             }
 
-            if (showNameKo || showPrice) {
-                ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#2d3436";
-                let drawY = y + imgHeight + 25; 
-                if (showNameKo) {
-                    ctx.font = "bold 15px 'Gowun Dodum', sans-serif";
-                    const lines = getLines(item.nameKo, cardWidth - 20);
-                    lines.slice(0, 2).forEach(line => {
-                        ctx.fillText(line, x + (cardWidth/2), drawY); drawY += 20;
-                    });
-                }
-                if (showPrice) {
-                    ctx.font = "bold 14px 'Gowun Dodum', sans-serif"; ctx.fillStyle = "#636e72"; 
-                    ctx.fillText(item.price || '-', x + (cardWidth/2), drawY);
-                }
+            let contentHeight = 0;
+            if (showText) contentHeight += lines.length * nameLineHeight;
+            if (showPrice) contentHeight += priceLineHeight;
+            if (showText && showPrice) contentHeight += 5; 
+
+            const textAreaCenterY = y + imgHeight + (textHeight / 2);
+            let drawY = textAreaCenterY - (contentHeight / 2) + (nameLineHeight / 2); 
+
+            if (showText) {
+                ctx.font = "bold 15px 'Pretendard', sans-serif";
+                lines.forEach(line => { ctx.fillText(line, x + (cardWidth/2), drawY); drawY += nameLineHeight; });
+            }
+
+            if (showPrice) {
+                if (showText) drawY += 5; 
+                if (!showText) drawY = textAreaCenterY - (priceLineHeight / 2) + (priceLineHeight / 2); 
+                ctx.font = "14px 'Pretendard', sans-serif"; ctx.fillStyle = "#182558"; 
+                ctx.fillText(item.price || '-', x + (cardWidth/2), drawY);
             }
         }
     }
     return cvs.toDataURL('image/jpeg', 0.9);
 }
 
-window.downloadImage = function() {
+function downloadImage() {
     const img = document.getElementById('imgCollection');
     if(!img || !img.src) return;
     const link = document.createElement('a');
