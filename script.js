@@ -89,14 +89,10 @@ function parseCSV(csvText) {
 }
 
 function goHome() {
-    activeFilters = { country: 'all', character: 'all', group: 'all' };
-    
-    // 버튼 초기화 (모든 active 클래스 제거)
-    document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
-
+    resetFilters(); // 홈으로 갈 때 필터 초기화 기능 활용
     closeSidebar();
     closePreview();
-    renderAllList();
+    renderAllList(); // resetFilters에 포함되어 있지만 확실히 하기 위해
     scrollToTop();
 }
 
@@ -105,9 +101,16 @@ function closePreview() {
     previewContainer.style.display = 'none';
     document.getElementById('imgCollection').src = "";
 }
+
 function renderNavMenu() {
-    // 💡 행님 요청: "국가", "캐릭터", "종류" 텍스트(span 태그) 완전히 삭제!
+    // 💡 행님 요청: 맨 위에 "필터" 텍스트와 리셋 아이콘 추가!
+    // (아이콘 경로는 행님이 말씀하신 img/icon/reset.png 로 설정했습니다)
     const filterHtml = `
+        <div class="filter-header">
+            <span class="filter-header-text">필터</span>
+            <img src="img/icon/reset.png" class="filter-reset-icon" onclick="resetFilters()" alt="초기화" title="필터 초기화">
+        </div>
+
         <div class="filter-row">
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
@@ -138,10 +141,10 @@ function renderNavMenu() {
     navMenuContainer.innerHTML = filterHtml;
     sidebarContent.innerHTML = filterHtml;
 }
+
 window.setFilter = function(type, value, btnElem) {
-    // 토글(Toggle) 로직 적용 완료
     if (activeFilters[type] === value) {
-        activeFilters[type] = 'all'; // 선택 해제
+        activeFilters[type] = 'all'; // 토글 해제
         document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.remove('active'));
     } else {
         activeFilters[type] = value; // 새로 선택
@@ -150,7 +153,7 @@ window.setFilter = function(type, value, btnElem) {
     }
 
     applyMultiFilters();
-    window.scrollTo(0, 0); 
+    // window.scrollTo(0, 0); // 💡 필터 누를 때마다 맨 위로 튀는 게 싫으시면 이 줄을 지우세요.
 };
 
 function toggleSidebar() {
@@ -217,7 +220,6 @@ function renderList(items) {
 
             const imgSrc = item.image || 'https://via.placeholder.com/150?text=No+Image';
 
-            // 리스트 화면 일본어 삭제 완료
             card.innerHTML = `
                 <div class="item-img-wrapper">
                     <img src="${imgSrc}" loading="lazy" alt="${item.nameKo}">
@@ -264,6 +266,19 @@ window.resetRecords = function() {
         updateProgress();
         alert("초기화되었습니다.");
     }
+}
+
+// 💡 행님 요청: 필터 초기화 아이콘 클릭 시 실행될 함수
+window.resetFilters = function() {
+    // 1. 필터 상태 초기화
+    activeFilters = { country: 'all', character: 'all', group: 'all' };
+    
+    // 2. 버튼의 active 클래스 모두 제거 (시각적 초기화)
+    document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
+
+    // 3. 전체 리스트 다시 보여주기
+    applyMultiFilters();
+    scrollToTop();
 }
 
 function updateProgress() {

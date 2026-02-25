@@ -19,6 +19,11 @@
     --text-color: #333;
 }
 
+/* 💡 행님 요청: 필터 클릭 시 화면 움찔거림 방지 (스크롤바 강제 표시) */
+html {
+    overflow-y: scroll;
+}
+
 body {
     font-family: 'Pretendard', sans-serif;
     background-color: var(--bg-color);
@@ -38,7 +43,8 @@ header {
 
 .header-top-row { position: relative; margin-bottom: 30px; }
 
-h1, .preview-label, .category-title, .action-btn, .filter-label, .filter-action-btn {
+/* 폰트 적용 대상에 필터 헤더 텍스트 추가 */
+h1, .preview-label, .category-title, .action-btn, .filter-header-text, .filter-action-btn {
     font-family: 'Paperlogy', sans-serif;
 }
 
@@ -53,38 +59,69 @@ h1 {
     max-width: 1200px; margin: 0 auto;
 }
 
+/* 💡 행님 요청: "필터" 텍스트와 리셋 아이콘 영역 스타일 */
+.filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px; /* 텍스트와 아이콘 사이 간격 */
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.filter-header-text {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 0.9rem; /* 작게 */
+}
+
+.filter-reset-icon {
+    width: 15px; /* 아이콘 크기 조절 (텍스트와 어울리게) */
+    height: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+}
+
+.filter-reset-icon:hover {
+    transform: rotate(-30deg); /* 마우스 올리면 살짝 돌아가는 효과 */
+    opacity: 1;
+}
+
+
 .filter-row {
     display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%;
 }
 
-.filter-label { font-size: 1.1rem; color: var(--primary-color); margin-right: 5px; }
-
 .flag-btn {
     width: 36px; height: 24px; border-radius: 4px; border: 2px solid #dfe6e9;
     background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
 }
 .flag-btn .overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; opacity: 0; transition: 0.2s;
 }
 .flag-btn:hover .overlay { opacity: 1; }
-.flag-btn.active { border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-color); }
+.flag-btn.active { border-color: var(--primary-color); }
 
 .char-btn {
     width: 48px; height: 48px; border-radius: 12px; border: 2px solid #dfe6e9;
     background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
 }
 .char-btn .overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; opacity: 0; transition: 0.2s; text-align: center;
 }
 .char-btn:hover .overlay { opacity: 1; }
-.char-btn.active { border-color: var(--primary-color); box-shadow: 0 0 0 2px var(--primary-color); }
+.char-btn.active { border-color: var(--primary-color); }
 
 .text-btn { 
     padding: 8px 14px; border: 2px solid #dfe6e9; border-radius: 8px; 
     background: white; cursor: pointer; font-size: 14px; color: #636e72; 
     font-family: 'Pretendard', sans-serif; transition: 0.2s; font-weight: bold;
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
 }
 .text-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 .text-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
@@ -192,9 +229,4 @@ h1 {
     .bottom-row { justify-content: flex-start; overflow-x: auto; width: 100%; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
     .bottom-row::-webkit-scrollbar { display: none; }
     .filter-row { flex-wrap: wrap; }
-    
-    /* 모바일 환경 사이드바 필터 텍스트 숨김 처리 */
-    #sidebarContent .filter-label {
-        display: none;
-    }
 }
