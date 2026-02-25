@@ -13,6 +13,7 @@
 }
 
 :root {
+    /* 💡 행님 요청: 메인 테마 색상을 #9e94ca 로 변경! */
     --primary-color: #9e94ca; 
     --bg-color: #fafafa;
     --card-bg: #ffffff;
@@ -127,6 +128,7 @@ h1 {
     padding: 10px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer; 
     border: none; transition: all 0.2s; background-color: var(--primary-color); color: white; flex: 1; max-width: 150px;
 }
+/* 💡 행님 요청: 마우스 올렸을 때 네이비색 말고 자연스러운 짙은 보라색(#796ba8)으로 변경 */
 .filter-action-btn:hover { background-color: #796ba8; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .filter-action-btn.reset { background-color: #eee; color: #555; }
 .filter-action-btn.reset:hover { background-color: #ddd; }
@@ -193,6 +195,7 @@ h1 {
 .action-btn.cancel { background-color: #eee; color: #555; width: auto; padding: 10px 40px; }
 .action-btn.cancel:hover { background-color: #ddd; }
 .action-btn.download { background-color: var(--primary-color); color: white; }
+/* 💡 행님 요청: 미리보기 창의 저장 버튼 호버 색상도 똑같이 변경 */
 .action-btn.download:hover { background-color: #796ba8; }
 .action-btn.small-btn { width: auto; padding: 6px 15px; font-size: 0.85rem; border-radius: 6px; }
 
@@ -215,16 +218,7 @@ h1 {
     h1 { margin: 0; font-size: 1.3rem; line-height: 1; display: inline-block; vertical-align: middle; }
     #navMenuContainer { display: none; }
     .hamburger-menu { display: flex; }
-    
-    /* 💡 행님 요청: 모바일에서 3열로 출력 및 간격, 글자 크기 조정 */
-    .items-grid { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 8px; /* 간격 살짝 타이트하게 */
-    }
-    .item-info { padding: 8px 6px; } /* 여백 살짝 줄임 */
-    .item-name { font-size: 0.8rem; margin-bottom: 2px; } /* 글자 크기 살짝 줄임 */
-    .item-price { font-size: 0.75rem; }
-    
+    .items-grid { grid-template-columns: repeat(2, 1fr); }
     .floating-btns { bottom: 25px; right: 15px; }
     .float-btn { width: 40px; height: 40px; }
     .float-btn img { width: 22px; height: 22px; }
