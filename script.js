@@ -22,7 +22,7 @@ async function init() {
     setupEventListeners();
     await fetchData();
     if(productData.length > 0) {
-        renderNavMenu(); // 줄바꿈 구조의 필터 렌더링
+        renderNavMenu(); 
         renderAllList(); 
         updateProgress();
     }
@@ -91,9 +91,8 @@ function parseCSV(csvText) {
 function goHome() {
     activeFilters = { country: 'all', character: 'all', group: 'all' };
     
-    // 버튼 초기화 (ALL 활성화)
+    // 버튼 초기화 (모든 active 클래스 제거)
     document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('[onclick*="\'all\'"]').forEach(b => b.classList.add('active'));
 
     closeSidebar();
     closePreview();
@@ -108,11 +107,10 @@ function closePreview() {
 }
 
 function renderNavMenu() {
-    // 줄바꿈 형태의 농담곰 필터 + 요네즈 켄시 버튼(저장/초기화) HTML 생성
+    // ALL 버튼 삭제 완료
     const filterHtml = `
         <div class="filter-row">
             <span class="filter-label">국가</span>
-            <button class="text-btn active" onclick="setFilter('country', 'all', this)">ALL</button>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china', this)"><div class="overlay">중국</div></div>
@@ -121,7 +119,6 @@ function renderNavMenu() {
 
         <div class="filter-row">
             <span class="filter-label">캐릭터</span>
-            <button class="text-btn active" onclick="setFilter('character', 'all', this)">ALL</button>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma', this)"><div class="overlay">농담곰</div></div>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro', this)"><div class="overlay">두더지<br>고로케</div></div>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug', this)"><div class="overlay">퍼그 상</div></div>
@@ -130,7 +127,6 @@ function renderNavMenu() {
 
         <div class="filter-row">
             <span class="filter-label">종류</span>
-            <button class="text-btn active" onclick="setFilter('group', 'all', this)">ALL</button>
             <button class="text-btn" onclick="setFilter('group', '마스코트', this)">마스코트</button>
             <button class="text-btn" onclick="setFilter('group', '쿠션', this)">쿠션</button>
             <button class="text-btn" onclick="setFilter('group', '인형', this)">인형</button>
@@ -148,13 +144,15 @@ function renderNavMenu() {
 }
 
 window.setFilter = function(type, value, btnElem) {
-    activeFilters[type] = value;
-    
-    // 클릭된 타입과 같은 모든 버튼의 active 해제 (PC, 모바일 동기화)
-    document.querySelectorAll(`[onclick*="'${type}'"]`).forEach(el => el.classList.remove('active'));
-    
-    // 선택된 값과 동일한 모든 버튼에 active 추가
-    document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.add('active'));
+    // 토글(Toggle) 로직 적용 완료
+    if (activeFilters[type] === value) {
+        activeFilters[type] = 'all'; // 선택 해제
+        document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.remove('active'));
+    } else {
+        activeFilters[type] = value; // 새로 선택
+        document.querySelectorAll(`[onclick*="'${type}'"]`).forEach(el => el.classList.remove('active'));
+        document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.add('active'));
+    }
 
     applyMultiFilters();
     window.scrollTo(0, 0); 
@@ -224,6 +222,7 @@ function renderList(items) {
 
             const imgSrc = item.image || 'https://via.placeholder.com/150?text=No+Image';
 
+            // 리스트 화면 일본어 삭제 완료
             card.innerHTML = `
                 <div class="item-img-wrapper">
                     <img src="${imgSrc}" loading="lazy" alt="${item.nameKo}">
@@ -231,7 +230,6 @@ function renderList(items) {
                 </div>
                 <div class="item-info">
                     <div class="item-name">${item.nameKo}</div>
-                    <div class="item-subname">${item.nameJp || ''}</div>
                     <div class="item-price">${item.price || '-'}</div>
                 </div>
             `;
