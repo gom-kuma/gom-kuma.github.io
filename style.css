@@ -98,8 +98,8 @@ h1 {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; opacity: 0; transition: 0.2s;
 }
-/* 💡 행님 요청: active 상태가 아닐 때만 호버 효과 적용! */
-.flag-btn:not(.active):hover .overlay { opacity: 1; }
+/* 💡 행님 요청: 다시 클릭 상태 상관없이 무조건 호버 효과 나오게 롤백! */
+.flag-btn:hover .overlay { opacity: 1; }
 .flag-btn.active { border-color: var(--primary-color); }
 
 .char-btn {
@@ -111,8 +111,8 @@ h1 {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; opacity: 0; transition: 0.2s; text-align: center;
 }
-/* 💡 행님 요청: active 상태가 아닐 때만 호버 효과 적용! */
-.char-btn:not(.active):hover .overlay { opacity: 1; }
+/* 💡 행님 요청: 다시 클릭 상태 상관없이 무조건 호버 효과 나오게 롤백! */
+.char-btn:hover .overlay { opacity: 1; }
 .char-btn.active { border-color: var(--primary-color); }
 
 .text-btn { 
