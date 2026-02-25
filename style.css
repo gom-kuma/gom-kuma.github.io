@@ -13,7 +13,6 @@
 }
 
 :root {
-    /* 💡 행님 요청: 메인 테마 색상 #182558 로 변경! */
     --primary-color: #182558; 
     --bg-color: #fafafa;
     --card-bg: #ffffff;
@@ -99,7 +98,8 @@ h1 {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; opacity: 0; transition: 0.2s;
 }
-.flag-btn:hover .overlay { opacity: 1; }
+/* 💡 행님 요청: active 상태가 아닐 때만 호버 효과 적용! */
+.flag-btn:not(.active):hover .overlay { opacity: 1; }
 .flag-btn.active { border-color: var(--primary-color); }
 
 .char-btn {
@@ -111,7 +111,8 @@ h1 {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
     display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; opacity: 0; transition: 0.2s; text-align: center;
 }
-.char-btn:hover .overlay { opacity: 1; }
+/* 💡 행님 요청: active 상태가 아닐 때만 호버 효과 적용! */
+.char-btn:not(.active):hover .overlay { opacity: 1; }
 .char-btn.active { border-color: var(--primary-color); }
 
 .text-btn { 
@@ -128,7 +129,6 @@ h1 {
     padding: 10px 20px; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer; 
     border: none; transition: all 0.2s; background-color: var(--primary-color); color: white; flex: 1; max-width: 150px;
 }
-/* 💡 행님 요청: 마우스 오버 시 색상도 찰떡으로 맞춰뒀습니다 */
 .filter-action-btn:hover { background-color: #2a3b75; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .filter-action-btn.reset { background-color: #eee; color: #555; }
 .filter-action-btn.reset:hover { background-color: #ddd; }
@@ -157,7 +157,6 @@ h1 {
 .category-title { font-size: 1.2rem; margin-bottom: 15px; border-left: 5px solid var(--primary-color); padding-left: 10px; color: #444; }
 .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
 
-/* 💡 행님 요청: 카드 높이를 동일하게 맞추고, 내부를 Flex 컨테이너로 설정 */
 .item-card { 
     background: var(--card-bg); 
     border-radius: 10px; 
@@ -185,7 +184,6 @@ h1 {
     background-size: contain; background-repeat: no-repeat; background-position: center;
 }
 
-/* 💡 행님 요청: 정보 영역이 남은 높이를 다 차지하게 만들고... */
 .item-info { 
     padding: 10px; 
     text-align: left; 
@@ -196,7 +194,6 @@ h1 {
 .item-name { font-size: 0.95rem; font-weight: bold; margin-bottom: 4px; word-break: keep-all; }
 .item-subname { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
 
-/* 💡 가격표를 무조건 맨 바닥으로 밀어버립니다! */
 .item-price { 
     font-size: 0.85rem; 
     color: var(--primary-color); 
@@ -244,10 +241,7 @@ h1 {
     h1 { margin: 0; font-size: 1.3rem; line-height: 1; display: inline-block; vertical-align: middle; }
     #navMenuContainer { display: none; }
     .hamburger-menu { display: flex; }
-    
-    /* 💡 행님 요청: 3줄 싹 지우고 원래대로(2줄) 시원하게 롤백했습니다! */
     .items-grid { grid-template-columns: repeat(2, 1fr); }
-    
     .floating-btns { bottom: 25px; right: 15px; }
     .float-btn { width: 40px; height: 40px; }
     .float-btn img { width: 22px; height: 22px; }
