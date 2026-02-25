@@ -88,11 +88,10 @@ function parseCSV(csvText) {
     return data;
 }
 
-// 💡 행님 요청: 타이틀 누르면 필터 초기화 안 되게 수정!
 function goHome() {
     closeSidebar();
     closePreview();
-    applyMultiFilters(); // 필터는 현재 상태 그대로 유지해서 리스트 보여주기
+    applyMultiFilters(); 
     scrollToTop();
 }
 
@@ -103,6 +102,7 @@ function closePreview() {
 }
 
 function renderNavMenu() {
+    // 💡 행님 요청: 변경된 이미지 폴더 경로 적용 & filter 속성값(kr, jp 등) 및 한글화 적용
     const filterHtml = `
         <div class="filter-header">
             <span class="filter-header-text">필터</span>
@@ -110,17 +110,17 @@ function renderNavMenu() {
         </div>
 
         <div class="filter-row">
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china', this)"><div class="overlay">중국</div></div>
-            <div class="flag-btn" style="background-image: url('img/icon_flag/flag_tw.png');" onclick="setFilter('country', 'taiwan', this)"><div class="overlay">대만</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon/flag/flag_kr.png');" onclick="setFilter('country', 'kr', this)"><div class="overlay">한국</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon/flag/flag_jp.png');" onclick="setFilter('country', 'jp', this)"><div class="overlay">일본</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon/flag/flag_cn.png');" onclick="setFilter('country', 'cn', this)"><div class="overlay">중국</div></div>
+            <div class="flag-btn" style="background-image: url('img/icon/flag/flag_tw.png');" onclick="setFilter('country', 'tw', this)"><div class="overlay">대만</div></div>
         </div>
 
         <div class="filter-row">
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma', this)"><div class="overlay">농담곰</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro', this)"><div class="overlay">두더지<br>고로케</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug', this)"><div class="overlay">퍼그 상</div></div>
-            <div class="char-btn" style="background-image: url('img/icon_characters/icon_ngn.png');" onclick="setFilter('character', 'ngn', this)"><div class="overlay">기타</div></div>
+            <div class="char-btn" style="background-image: url('img/icon/characters/icon_kuma.png');" onclick="setFilter('character', '농담곰', this)"><div class="overlay">농담곰</div></div>
+            <div class="char-btn" style="background-image: url('img/icon/characters/icon_mogukoro.png');" onclick="setFilter('character', '고로케', this)"><div class="overlay">두더지<br>고로케</div></div>
+            <div class="char-btn" style="background-image: url('img/icon/characters/icon_pug.png');" onclick="setFilter('character', '퍼그', this)"><div class="overlay">퍼그 상</div></div>
+            <div class="char-btn" style="background-image: url('img/icon/characters/icon_other.png');" onclick="setFilter('character', '기타', this)"><div class="overlay">기타</div></div>
         </div>
 
         <div class="filter-row">
@@ -142,10 +142,10 @@ function renderNavMenu() {
 
 window.setFilter = function(type, value, btnElem) {
     if (activeFilters[type] === value) {
-        activeFilters[type] = 'all'; // 토글 해제
+        activeFilters[type] = 'all'; 
         document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.remove('active'));
     } else {
-        activeFilters[type] = value; // 새로 선택
+        activeFilters[type] = value; 
         document.querySelectorAll(`[onclick*="'${type}'"]`).forEach(el => el.classList.remove('active'));
         document.querySelectorAll(`[onclick*="'${type}', '${value}'"]`).forEach(el => el.classList.add('active'));
     }
@@ -190,9 +190,7 @@ function renderList(items) {
     const grouped = new Map();
     items.forEach(item => {
         let key = item.group;
-        if (activeFilters.character === 'ngn' && item.subGroup) {
-            key = item.subGroup;
-        }
+        // 💡 행님 요청: subGroup 분기 처리 완전히 삭제 완료
         if (!grouped.has(key)) grouped.set(key, []);
         grouped.get(key).push(item);
     });
