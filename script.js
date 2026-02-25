@@ -105,12 +105,10 @@ function closePreview() {
     previewContainer.style.display = 'none';
     document.getElementById('imgCollection').src = "";
 }
-
 function renderNavMenu() {
-    // ALL 버튼 삭제 완료
+    // 💡 행님 요청: "국가", "캐릭터", "종류" 텍스트(span 태그) 완전히 삭제!
     const filterHtml = `
         <div class="filter-row">
-            <span class="filter-label">국가</span>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_kr.png');" onclick="setFilter('country', 'korea', this)"><div class="overlay">한국</div></div>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_jp.png');" onclick="setFilter('country', 'japan', this)"><div class="overlay">일본</div></div>
             <div class="flag-btn" style="background-image: url('img/icon_flag/flag_cn.png');" onclick="setFilter('country', 'china', this)"><div class="overlay">중국</div></div>
@@ -118,7 +116,6 @@ function renderNavMenu() {
         </div>
 
         <div class="filter-row">
-            <span class="filter-label">캐릭터</span>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_kuma.png');" onclick="setFilter('character', 'kuma', this)"><div class="overlay">농담곰</div></div>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_mogukoro.png');" onclick="setFilter('character', 'mogukoro', this)"><div class="overlay">두더지<br>고로케</div></div>
             <div class="char-btn" style="background-image: url('img/icon_characters/icon_pug.png');" onclick="setFilter('character', 'pug', this)"><div class="overlay">퍼그 상</div></div>
@@ -126,7 +123,6 @@ function renderNavMenu() {
         </div>
 
         <div class="filter-row">
-            <span class="filter-label">종류</span>
             <button class="text-btn" onclick="setFilter('group', '마스코트', this)">마스코트</button>
             <button class="text-btn" onclick="setFilter('group', '쿠션', this)">쿠션</button>
             <button class="text-btn" onclick="setFilter('group', '인형', this)">인형</button>
@@ -142,7 +138,6 @@ function renderNavMenu() {
     navMenuContainer.innerHTML = filterHtml;
     sidebarContent.innerHTML = filterHtml;
 }
-
 window.setFilter = function(type, value, btnElem) {
     // 토글(Toggle) 로직 적용 완료
     if (activeFilters[type] === value) {
