@@ -88,11 +88,11 @@ function parseCSV(csvText) {
     return data;
 }
 
+// 💡 행님 요청: 타이틀 누르면 필터 초기화 안 되게 수정!
 function goHome() {
-    resetFilters(); // 홈으로 갈 때 필터 초기화 기능 활용
     closeSidebar();
     closePreview();
-    renderAllList(); // resetFilters에 포함되어 있지만 확실히 하기 위해
+    applyMultiFilters(); // 필터는 현재 상태 그대로 유지해서 리스트 보여주기
     scrollToTop();
 }
 
@@ -103,8 +103,6 @@ function closePreview() {
 }
 
 function renderNavMenu() {
-    // 💡 행님 요청: 맨 위에 "필터" 텍스트와 리셋 아이콘 추가!
-    // (아이콘 경로는 행님이 말씀하신 img/icon/reset.png 로 설정했습니다)
     const filterHtml = `
         <div class="filter-header">
             <span class="filter-header-text">필터</span>
@@ -153,7 +151,6 @@ window.setFilter = function(type, value, btnElem) {
     }
 
     applyMultiFilters();
-    // window.scrollTo(0, 0); // 💡 필터 누를 때마다 맨 위로 튀는 게 싫으시면 이 줄을 지우세요.
 };
 
 function toggleSidebar() {
@@ -268,15 +265,9 @@ window.resetRecords = function() {
     }
 }
 
-// 💡 행님 요청: 필터 초기화 아이콘 클릭 시 실행될 함수
 window.resetFilters = function() {
-    // 1. 필터 상태 초기화
     activeFilters = { country: 'all', character: 'all', group: 'all' };
-    
-    // 2. 버튼의 active 클래스 모두 제거 (시각적 초기화)
     document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
-
-    // 3. 전체 리스트 다시 보여주기
     applyMultiFilters();
     scrollToTop();
 }

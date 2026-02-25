@@ -19,7 +19,6 @@
     --text-color: #333;
 }
 
-/* 💡 행님 요청: 필터 클릭 시 화면 움찔거림 방지 (스크롤바 강제 표시) */
 html {
     overflow-y: scroll;
 }
@@ -43,7 +42,6 @@ header {
 
 .header-top-row { position: relative; margin-bottom: 30px; }
 
-/* 폰트 적용 대상에 필터 헤더 텍스트 추가 */
 h1, .preview-label, .category-title, .action-btn, .filter-header-text, .filter-action-btn {
     font-family: 'Paperlogy', sans-serif;
 }
@@ -59,24 +57,24 @@ h1 {
     max-width: 1200px; margin: 0 auto;
 }
 
-/* 💡 행님 요청: "필터" 텍스트와 리셋 아이콘 영역 스타일 */
 .filter-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px; /* 텍스트와 아이콘 사이 간격 */
+    gap: 6px; 
     margin-bottom: 5px;
     width: 100%;
 }
 
+/* 💡 행님 요청: 텍스트 색상을 #636e72로 변경! */
 .filter-header-text {
-    color: var(--primary-color);
+    color: #636e72; 
     font-weight: bold;
-    font-size: 0.9rem; /* 작게 */
+    font-size: 0.9rem; 
 }
 
 .filter-reset-icon {
-    width: 15px; /* 아이콘 크기 조절 (텍스트와 어울리게) */
+    width: 15px; 
     height: 15px;
     cursor: pointer;
     transition: transform 0.2s ease;
@@ -84,10 +82,9 @@ h1 {
 }
 
 .filter-reset-icon:hover {
-    transform: rotate(-30deg); /* 마우스 올리면 살짝 돌아가는 효과 */
+    transform: rotate(-30deg); 
     opacity: 1;
 }
-
 
 .filter-row {
     display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%;
@@ -96,7 +93,7 @@ h1 {
 .flag-btn {
     width: 36px; height: 24px; border-radius: 4px; border: 2px solid #dfe6e9;
     background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
-    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+    box-sizing: border-box; 
 }
 .flag-btn .overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
@@ -108,7 +105,7 @@ h1 {
 .char-btn {
     width: 48px; height: 48px; border-radius: 12px; border: 2px solid #dfe6e9;
     background-size: cover; background-position: center; cursor: pointer; position: relative; overflow: hidden;
-    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+    box-sizing: border-box; 
 }
 .char-btn .overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); color: white;
@@ -121,7 +118,7 @@ h1 {
     padding: 8px 14px; border: 2px solid #dfe6e9; border-radius: 8px; 
     background: white; cursor: pointer; font-size: 14px; color: #636e72; 
     font-family: 'Pretendard', sans-serif; transition: 0.2s; font-weight: bold;
-    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+    box-sizing: border-box; 
 }
 .text-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 .text-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
