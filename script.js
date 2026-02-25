@@ -5,7 +5,8 @@ const STORAGE_KEY = 'nongdam_kenshistyle_owned';
 
 let ownedItems = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
 
-let activeFilters = { country: 'all', character: 'all', group: 'all' };
+// 💡 행님 요청: 기본 필터 상태를 '농담곰'으로 설정했습니다!
+let activeFilters = { country: 'all', character: '농담곰', group: 'all' };
 
 const listContainer = document.getElementById('listContainer');
 const navMenuContainer = document.getElementById('navMenuContainer');
@@ -23,7 +24,8 @@ async function init() {
     await fetchData();
     if(productData.length > 0) {
         renderNavMenu(); 
-        renderAllList(); 
+        // 💡 처음 페이지 로드 시 전체 리스트가 아닌 설정된 필터(농담곰)를 바로 적용합니다.
+        applyMultiFilters(); 
         updateProgress();
     }
 }
@@ -102,7 +104,7 @@ function closePreview() {
 }
 
 function renderNavMenu() {
-    // 💡 행님 요청: 변경된 이미지 폴더 경로 적용 & filter 속성값(kr, jp 등) 및 한글화 적용
+    // 💡 행님 요청: 농담곰 버튼에만 미리 'active' 클래스를 딱 넣어뒀습니다!
     const filterHtml = `
         <div class="filter-header">
             <span class="filter-header-text">필터</span>
@@ -117,7 +119,7 @@ function renderNavMenu() {
         </div>
 
         <div class="filter-row">
-            <div class="char-btn" style="background-image: url('img/icon/characters/icon_kuma.png');" onclick="setFilter('character', '농담곰', this)"><div class="overlay">농담곰</div></div>
+            <div class="char-btn active" style="background-image: url('img/icon/characters/icon_kuma.png');" onclick="setFilter('character', '농담곰', this)"><div class="overlay">농담곰</div></div>
             <div class="char-btn" style="background-image: url('img/icon/characters/icon_mogukoro.png');" onclick="setFilter('character', '고로케', this)"><div class="overlay">두더지<br>고로케</div></div>
             <div class="char-btn" style="background-image: url('img/icon/characters/icon_pug.png');" onclick="setFilter('character', '퍼그', this)"><div class="overlay">퍼그 상</div></div>
             <div class="char-btn" style="background-image: url('img/icon/characters/icon_other.png');" onclick="setFilter('character', '기타', this)"><div class="overlay">기타</div></div>
@@ -190,7 +192,6 @@ function renderList(items) {
     const grouped = new Map();
     items.forEach(item => {
         let key = item.group;
-        // 💡 행님 요청: subGroup 분기 처리 완전히 삭제 완료
         if (!grouped.has(key)) grouped.set(key, []);
         grouped.get(key).push(item);
     });
@@ -250,7 +251,8 @@ function toggleCheck(id) {
 }
 
 function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 💡 행님 요청: 스르르 올라가는 효과(behavior: 'smooth') 삭제! 즉시 위로 딱 꽂힙니다.
+    window.scrollTo(0, 0); 
 }
 
 window.resetRecords = function() {
@@ -264,6 +266,7 @@ window.resetRecords = function() {
 }
 
 window.resetFilters = function() {
+    // 💡 행님 요청: 필터 초기화 클릭 시 모든 필터를 완전히 해제(all)합니다.
     activeFilters = { country: 'all', character: 'all', group: 'all' };
     document.querySelectorAll('[onclick*="setFilter"]').forEach(b => b.classList.remove('active'));
     applyMultiFilters();
